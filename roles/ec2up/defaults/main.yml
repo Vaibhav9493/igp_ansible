@@ -1,11 +1,11 @@
-ec2_key_name: igp-prod-api
-ec2_sg_id: "sg-2fa5af5d,sg-0f39cd8f51681479a"
+ec2_key_name: awskg
+ec2_sg_id: "sg-023535762d96d7afa"
 processor_type: graviton
 ec2_instance_type: t4g.small
 termination_protection: "false"
-graviton_ec2_ami_id: "ami-04ace70e7f6a09d4a"
-intel_ec2_ami_id: "ami-08f362c39d03a4eb5"
-ec2_subnet_id: subnet-0acc71da8e7560bdc
+graviton_ec2_ami_id: "ami-0e9216ada6e26af2c"
+intel_ec2_ami_id: "ami-0e9216ada6e26af2c"
+ec2_subnet_id: subnet-0adf93d205afb6ca5
 ec2_region: "us-east-1"
 assign_public_ip: false
 ec2_tag_Name: test-instance
