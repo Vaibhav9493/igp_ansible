@@ -7,5 +7,4 @@
 ---
 - hosts: localhost
   roles:
-    - { role: "ec2up" }
-    
+    - ec2up
