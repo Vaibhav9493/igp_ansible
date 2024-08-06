@@ -1,9 +1,0 @@
-# Playbook to create AMI from an EC2 instance
-# Notes:
-#   - create_ami --> Role for creating AMI
-# Example invocation:
-#   ansible-playbook -vvv /etc/ansible/playbooks/create_ami.yml -e ami_instance_id="$instance_id" -e ami_name="$ami_name" -e ami_tag_environment="$ami_environment" -e ami_region="$ami_region" -e ami_tag_service_name="$ami_tag_service_name" -e ami_tag_team="$ami_tag_team" -e ami_tag_app_version="$ami_tag_app_version"
-
-- hosts: "{{playbook_host}}"
-  roles:
-    - { role: "create_ami" }

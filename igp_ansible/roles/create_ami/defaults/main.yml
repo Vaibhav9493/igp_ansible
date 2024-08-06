@@ -1,7 +1,0 @@
-ami_region: us-east-1
-ami_name: test-testing-ami-001
-ami_tag_env: testing
-ami_tag_service_name: test-service
-ami_tag_team: devops
-ami_tag_app_version: v1
-ami_tag_dont_delete: true
