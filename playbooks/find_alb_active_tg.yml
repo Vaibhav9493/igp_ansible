@@ -1,0 +1,14 @@
+# Generic Playbook for finding active target group for alb
+# Notes:
+#   - find_alb_info --> Role for finding alb information.
+# Example invocation:
+#   ansible-playbook -vvv /etc/ansible/playbooks/find_alb_active_tg.yml -e alb_name="$alb_name" -e alb_region="$alb_region"
+
+- hosts: "localhost"
+  roles:
+    - { role: "find_alb_info" }
+  tasks:
+    - name: fetching active target group from alb
+      local_action:
+        module: debug
+        msg: "{% for r in albinfo.load_balancers.0.listeners %}{% if r.protocol == 'HTTPS' %}{% for a in r.rules %}{% if a.priority == 'default' %}{% for fc in a.actions %}{% if fc.forward_config is defined %}{{(fc.forward_config.target_groups|sort(reverse=true, attribute='weight')).0.target_group_arn}}{% endif %}{% endfor %}{% endif %}{% endfor %}{% endif %}{% endfor %}"

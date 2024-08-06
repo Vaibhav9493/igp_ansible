@@ -1,0 +1,21 @@
+# Playbook to delete the ASG, LT and AMIs except the latest 
+# Notes:
+#   - get-all-asgs --> Role to get list of asg's.
+#   - delete-asg --> Role to delete the listed asg's.
+#   - get-all-lts --> Role to get list of lt's.
+#   - delete-lts --> Role to delete the listed lt's.
+#   - find_ami --> Role to get list of ami's.
+#   - delete-amis --> Role to delete the listed ami's.
+# Example invocation:
+# ansible-playbook /etc/ansible/playbooks/delete-deployment-asg-lt-ami.yml -e asgname="$asgname" -e ltname="$ltname" -e ami_service=$ami_service -e region="$region" -e count="$count"
+
+- name: Delete deployment autoscaling groups, Launch Templates and AMIs except top {{count}} sorted by time
+  hosts: localhost
+  gather_facts: False
+  roles:
+   - { role: "get-all-asgs" }
+   - { role: "delete-asg" }
+   - { role: "get-all-lts" }
+   - { role: "delete-lts" }
+   - { role: "find_ami" , filters: {"tag:service": "{{ami_service}}"} }
+   - { role: "delete-amis", ami_ids: "{{ (ami_list.images | sort(attribute='creation_date', reverse=true) | map(attribute='image_id') | list)[(count|int):] }}" }

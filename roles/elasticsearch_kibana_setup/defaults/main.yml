@@ -1,0 +1,11 @@
+ec2_tag_cluster: test-instance
+publicBaseUrl: "https://catalogue-manager.igp.com"
+fs_type: xfs
+mount_path: /data
+mount_src: /dev/nvme1n1p1
+mount_opts: defaults,nofail
+mount_state: mounted
+mount_dump: '0'
+mount_passno: '2'
+elasticsearch_password: testinstance123
+elasticsearch_kibana_version: 8.10.4

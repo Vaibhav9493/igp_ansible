@@ -1,0 +1,10 @@
+---
+- name: Refresh asg instance
+  local_action:
+    module: community.aws.autoscaling_instance_refresh
+    name: "{{ asg_name }}"
+    state: started
+    region: "{{ asg_region }}"
+    preferences:
+      min_healthy_percentage: "{{ min_healthy_percentage }}"
+      instance_warmup: "{{ instance_warmup }}"

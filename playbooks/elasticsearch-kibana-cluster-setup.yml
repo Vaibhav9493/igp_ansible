@@ -1,0 +1,21 @@
+# Generic Playbook for creating the EC2 instances.
+# Notes:
+#   - ec2up --> Role for creating the EC2 instances.
+#   - ec2_extra_volume --> Role for adding extra volume to launched  EC2 instances
+#   - ansible_role_elastic_agent --> Role for installing fleet agent on ec2 instance
+#   - elasticsearch_kibana_setup --> Role for configuring elasticsearch and kibana
+# Example invocation:
+#   ansible-playbook -vvv /etc/ansible/playbooks/elasticsearch-kibana-cluster-setup.yml -e ec2_key_name="$ec2_key_name" -e ec2_sg_id="$ec2_sg_id" -e ec2_instance_type="$ec2_instance_type" -e termination_protection="$termination_protection" -e ec2_instance_profile="$ec2_instance_profile" -e processor_type="$processor_type" -e graviton_ec2_ami_id="$graviton_ec2_ami_id" -e intel_ec2_ami_id="$intel_ec2_ami_id" -e ec2_subnet_id="$ec2_subnet_id" -e ec2_region="$ec2_region" -e assign_public_ip="$assign_public_ip" -e ec2_tag_Name="$ec2_tag_Name" -e ec2_tag_environment="$ec2_tag_environment" -e ec2_tag_cluster="$ec2_tag_cluster" -e ec2_tag_os="$ec2_tag_os" -e ec2_tag_os_user="$ec2_tag_os_user" -e ec2_tag_ssh_port="$ec2_tag_ssh_port" -e ec2_tag_service="$ec2_tag_service" -e ec2_tag_team="$ec2_tag_team" -e ec2_tag_app_version="$ec2_tag_app_version" -e ec2_count="$ec2_count" -e ec2_volume_size="$ec2_volume_size" -e vol_size="$vol_size" -e vol_type="$vol_type" -e vol_region="$vol_region" -e vol_tag_name="$vol_tag_name" -e vol_device_name="$vol_device_name" -e vol_os_name="$vol_os_name" -e partition_num="$partition_num" -e fs_type="$fs_type" -e mount_src="$mount_src" -e elastic_agent_version"$elastic_agent_version" -e graviton_architecture="$graviton_architecture" -e intel_architecture="$intel_architecture" -e elastic_fleet_url="$elastic_fleet_url" -e elastic_fleet_enrolment_token="$elastic_fleet_enrolment_token" -e instance_tag_name="$instance_tag_name" -e publicBaseUrl="$publicBaseUrl" -e mount_path="$mount_path" -e mount_opts="$mount_opts" -e mount_state="$mount_state" -e mount_dump="$mount_dump" -e mount_passno="$mount_passno" -e elasticsearch_password="$elasticsearch_password" -e elasticsearch_kibana_version="$elasticsearch_kibana_version"    
+---
+- hosts: localhost
+  gather_facts: false
+  roles:
+    - { role: "ec2up" }
+    - { role: "ec2_extra_volume" }
+
+- hosts: launched-instances
+  gather_facts: true
+  become: yes
+  roles:
+  - { role: "ansible_role_elastic_agent" }
+  - { role: "elasticsearch_kibana_setup" }

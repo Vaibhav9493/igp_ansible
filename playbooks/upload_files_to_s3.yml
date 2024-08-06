@@ -1,0 +1,25 @@
+# Generic playbook for uploading multiple files to a s3 bucket in multiple folders and then deleing those files from local system.
+# Notes:
+#   - upload_files_to_s3 --> Role to upload the multiple files to s3 bucket.
+
+# Example invocation:
+# ansible-playbook -vvv /etc/ansible/playbooks/upload_files_to_s3.yml -e source_files="$source_files" -e s3_bucket="$s3_bucket" -e object_paths="$object_paths"
+
+- hosts: localhost
+  tasks:
+    - name: Upload files to S3
+      include_role:
+        name: upload_files_to_s3
+      vars:
+        object_path: "{{object_paths_item}}"
+      loop: "{{ object_paths.split(',') }}"
+      loop_control:
+        loop_var: object_paths_item
+
+    - name: Delete the uploaded files from local system.
+      file:
+       path : "{{file_item}}"
+       state: absent
+      loop: "{{source_files.split(',')}}"
+      loop_control:
+        loop_var: file_item

@@ -1,0 +1,4 @@
+pm2_file: "pm2.json"
+tomcat_server_directory: "/opt/apache-tomcat"
+setenv_file: "setenv.sh-prod"
+elb_used: "yes"

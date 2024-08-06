@@ -1,0 +1,17 @@
+# Generic Playbook for deployment with autoscaling group using ALB.
+# Notes:
+#   - create_tg --> Role for creating the Target Group for EC2 Autoscaling.
+#   - create_lt --> Role for creating the Launch Template for EC2 Autoscaling.
+#   - create_lt_asg --> Role for creating the Autoscaling Group.
+#   - create_autoscaling_policy --> Role for creating the Autoscaling policy.
+# Example invocation:
+#   ansible-playbook -vvv /etc/ansible/playbooks/immute_deploy_mixed_alb.yml -e deployment_stack="$deployment_stack_name" -e start_job_build_number="$start_job_build_number" -e ami_id="$ami_id" -e tg_name="$tg_name" -e tg_protocol="$tg_protocol" -e tg_region="$tg_region" -e tg_port="$tg_port" -e tg_vpc_id="$tg_vpc_id" -e tg_healthcheck_protocol="$tg_healthcheck_protocol" -e tg_healthcheck_port="$tg_healthcheck_port" -e tg_healthcheck_path="$tg_healthcheck_path" -e tg_healthcheck_success_response_code="$tg_healthcheck_success_response_code" -e tg_healthcheck_interval="$tg_healthcheck_interval" -e tg_healthcheck_timeout="$tg_healthcheck_timeout" -e tg_healthcheck_healthy_count="$tg_healthcheck_healthy_count" -e tg_healthcheck_unhealthy_count="$tg_healthcheck_unhealthy_count" -e tg_deregistration_delay_timeout="$tg_deregistration_delay_timeout" -e ec2_tag_Name="$ec2_tag_Name" -e ec2_tag_environment="$ec2_tag_environment" -e ec2_tag_cluster="$ec2_tag_cluster" -e ec2_tag_service="$ec2_tag_service" -e ec2_tag_team="$ec2_tag_team" -e ec2_tag_app_version="$ec2_tag_app_version" -e ec2_key_pair="$ec2_key_pair" -e ec2_instance_profile="$ec2_instance_profile" -e ec2_sg_id="$ec2_sg_id" -e ec2_tag_os="$ec2_tag_os" -e ec2_tag_os_user="$ec2_tag_os_user" -e ec2_tag_ssh_port="$ec2_tag_ssh_port" -e lt_name="$lt_name" -e lt_version="$lt_version" -e asg_name="$asg_name" -e asg_base_size="$asg_base_size" -e asg_above_base_percent="$asg_above_base_percent" -e asg_min_size="$asg_min_size" -e asg_max_size="$asg_max_size" -e asg_desired_size="$asg_desired_size" -e asg_health_check_type="$asg_health_check_type" -e asg_health_check_period="$asg_health_check_period" -e asg_vpc_subnets="$asg_vpc_subnets" -e asg_region="$asg_region" -e asg_capacity_rebalance="$asg_capacity_rebalance" -e instance_type_list="$instance_type_list" -e on_demand_allocation_strategy="$on_demand_allocation_strategy" -e spot_allocation_strategy="$spot_allocation_strategy" -e lb_type="$lb_type" -e alb_name="$alb_name" -e asp_enable=true -e asp_name="$asp_name" -e asp_target_value="$asp_target_value" -e elastic_fleet_enrolment_token="$elastic_fleet_enrolment_token" -e elastic_fleet_url="$elastic_fleet_url" -e elastic_fleet_tags="$elastic_fleet_tags"
+
+- hosts: "localhost"
+  roles:
+    - { role: "create_tg" }
+    - { role: "create_lt" }
+    - { role: "find_alb_info" }
+    - { role: "modify_alb_listeners", listener_arn: "{% for r in albinfo.load_balancers %}{% for la in r. listeners %}{% if la.protocol == 'HTTPS' %}{{ la.listener_arn.split(' ') | join(',') }}{% endif %}{% endfor %}{% endfor %}", target_group_arn_100: "{% for r in albinfo.load_balancers.0.listeners %}{% if r.protocol == 'HTTPS' %}{% for a in r.rules %}{% if a.priority == 'default' %}{% for fc in a.actions %}{% if fc.forward_config is defined %}{{(fc.forward_config.target_groups|sort(reverse=true, attribute='weight')).0.target_group_arn}}{% endif %}{% endfor %}{% endif %}{% endfor %}{% endif %}{% endfor %}", target_group_arn_0: "{{ tg_arn.target_group_arn }}" }
+    - { role: "create_lt_asg", lb_entity: "{{ tg_arn.target_group_arn }}" }
+    - { role: "create_autoscaling_policy", when: asp_enable == true }

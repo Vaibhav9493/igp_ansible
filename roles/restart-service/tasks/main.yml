@@ -1,0 +1,7 @@
+---
+# tasks file for /vagrant/ec2service-operations/roles/restart-service
+- name: Include vars for role
+  include_vars:
+    file: /etc/ansible/roles/restart-service/vars/{{ servicename }}
+- name: restart service
+  shell: "{{ restart_command }}"

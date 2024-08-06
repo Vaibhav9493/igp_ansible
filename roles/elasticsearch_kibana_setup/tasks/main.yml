@@ -1,0 +1,129 @@
+---
+- name: Install epel-release packages
+  dnf:
+   name:
+    - epel-release
+   state: present
+
+- name: Update all packages
+  dnf:
+   name: '*'
+   state: latest   
+
+- name: Install packages
+  dnf:
+   name:
+    - vim
+    - wget
+    - unzip
+    - sysstat
+    - net-tools
+    - htop
+   state: present
+
+- name: Update crypto policies to LEGACY
+  command:
+   cmd: update-crypto-policies --set LEGACY
+
+- name: Reboot the machine
+  reboot:
+
+- name: Import an RPM key
+  rpm_key:
+   state: present
+   key: https://artifacts.elastic.co/GPG-KEY-elasticsearch
+
+- name: Copy the content for elastic repo
+  template:
+    src: elastic.repo.j2
+    dest: /etc/yum.repos.d/elastic.repo
+
+- name: Install elasticsearch and kibana
+  dnf:
+   name:
+    - elasticsearch-{{elasticsearch_kibana_version}}
+    - kibana-{{elasticsearch_kibana_version}}
+   state: present
+
+- name: Create directory /data 
+  file:
+   path: "{{ mount_path }}"
+   state: directory
+
+- name: Mount filesystem
+  ansible.posix.mount:
+            path: "{{ mount_path }}"
+            src: "{{ mount_src }}"
+            fstype: "{{ fs_type }}"
+            state: "{{ mount_state }}"
+            opts: "{{mount_opts}}"
+            dump: "{{ mount_dump }}"
+            passno: "{{ mount_passno }}"
+  delegate_to: "{{ inventory_hostname }}"
+
+- name: Create directory and give owernership
+  file:
+   path: /data/elasticsearch
+   state: directory
+   owner: elasticsearch
+   group: elasticsearch
+   mode: '0755'
+
+- name: Write the configuration for elasticsearch
+  template:
+    src: elasticsearch.yml.j2
+    dest: /etc/elasticsearch/elasticsearch.yml
+
+- name: Install discovery-ec2 plugin
+  shell: "echo y | /usr/share/elasticsearch/bin/elasticsearch-plugin install discovery-ec2"
+
+- name: Start elasticsearch service
+  systemd:
+   name: elasticsearch.service
+   state: started
+
+- name: Run elasticsearch-reset-password command
+  shell: |
+   echo -e "y\n{{elasticsearch_password}}\n{{elasticsearch_password}}" | /usr/share/elasticsearch/bin/elasticsearch-reset-password -u elastic -i
+
+- name: Create enrollment token 
+  shell: "echo y | /usr/share/elasticsearch/bin/elasticsearch-create-enrollment-token -s kibana"
+  register: es_token
+
+
+- name: Update the configuration for Kibana
+  template:
+    src: kibana.yml.j2
+    dest: /etc/kibana/kibana.yml
+
+- name: Run Kibana setup and input token
+  shell: echo "{{ es_token.stdout }}" | /usr/share/kibana/bin/kibana-setup
+
+- name: Start Kibana service
+  systemd:
+   name: kibana.service
+   state: started
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

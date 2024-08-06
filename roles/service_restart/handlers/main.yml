@@ -1,0 +1,109 @@
+---
+
+- name: stop pm2_service
+  shell: nohup pm2 delete all
+  args:
+    chdir: "{{install_directory}}"
+  ignore_errors: yes
+  listen: "delete_pm2_service"
+
+- name: stop tomcat server
+  service: name=apache-tomcat state=stopped
+  listen: "stop_tomcat_server"
+
+- name: kill webpack service
+  shell: nohup pkill -f webpack
+  args:
+    chdir: "{{install_directory}}"
+  ignore_errors: yes
+  listen: "kill_webpack"
+
+- name: Add private repo Authentication
+  become: yes
+  template:
+    src: npmrc.j2
+    dest: "{{install_directory}}/.npmrc"
+    owner: root
+    group: root
+    mode: 0644
+  listen: "check_npmrc"
+
+- name: set environment file.
+  become: yes
+  shell: "mv {{install_directory}}/conf/setenv.sh-{{dep_env}} {{tomcat_server_directory}}/bin/setenv.sh"
+  listen: "set_env_file"
+
+- name: update npm packages
+  become: yes
+  shell: npm install
+  args:
+    chdir: "{{install_directory}}"
+  ignore_errors: yes
+  listen: "update_npm_package"
+
+- name: update npm packages
+  become: yes
+  shell: yarn install
+  args:
+    chdir: "{{install_directory}}"
+  ignore_errors: yes
+  listen: "update_yarn_package"
+
+- name: run yarn
+  become: yes
+  shell: yarn
+  args:
+    chdir: "{{install_directory}}"
+  ignore_errors: yes
+  listen: "run_yarn"
+
+- name: start redis
+  shell: nohup /bin/bash /etc/init.d/redis_6379 restart
+  listen: "start_pc_redis"
+
+- name: add newrelic config
+  template:
+      src: newrelic_plugin.yml.j2
+      dest: /home/ec2-user/kenji/newrelic_redis_plugin-1.0.1/config/newrelic_plugin.yml
+      owner: ec2-user
+      group: ec2-user
+      mode: 0644
+  listen: "add_new_relic_conf"
+
+- name: stop new relic plugin
+  shell: nohup ruby /home/ec2-user/kenji/newrelic_redis_plugin-1.0.1/newrelic_redis_agent -k -d
+  listen: "stop_pc_newrelic"
+
+- name: start new relic plugin
+  shell: nohup ruby /home/ec2-user/kenji/newrelic_redis_plugin-1.0.1/newrelic_redis_agent -d
+  listen: "start_pc_newrelic"
+
+- name: start webpack-dev-server
+  shell: "nohup pm2 start {{pm2_file}}"
+  args:
+    chdir: "{{install_directory}}"
+  listen: "start_webpack_dev_server"
+
+- name: start pm2_service
+  shell: "nohup pm2 start {{pm2_file}}"
+  args:
+    chdir: "{{install_directory}}"
+  listen: "start_pm2_service"
+
+- name: start tomcat server
+  service: name=apache-tomcat state=started
+  listen: "start_tomcat_server"
+
+- name: start pm2_service for pwafrontend
+  shell: nohup /bin/bash deploy.sh
+  args:
+    chdir: "{{install_directory}}"
+  listen: "start_pwa_service"
+
+- name: restart nginx
+  service: name=nginx state=restarted
+  listen: "restart_nginx"
+
+- name: clear cloudfront cache
+  shell: aws cloudfront create-invalidation --distribution-id "{{distribution_id}}" --paths  "{{invalidation_path}}"
+  listen: "clear_cf"

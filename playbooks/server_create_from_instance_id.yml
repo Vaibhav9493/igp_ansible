@@ -1,0 +1,12 @@
+# Playbook to create AMI from an EC2 instance
+# Notes:
+#   - create_ami --> Role for creating AMI
+#   - ec2up --> Role for create server from instance id 
+# Example invocation:
+#ansible-playbook  -vvv ansible/playbooks/server_create_from_instance_id.yml -e ami_instance_id="$ami_instance_id" -e ami_name="$ec2_tag_Name" -e ami_tag_environment="$ec2_tag_environment" -e ami_region="us-east-1" -e ami_tag_service_name="$ec2_tag_service" -e ami_tag_team="$ec2_tag_team" -e ec2_key_name="$ec2_key_name"  -e ec2_instance_type="$ec2_instance_type"  -e ec2_tag_Name="$ec2_tag_Name" -e ec2_tag_environment="$ec2_tag_environment" -e ec2_tag_service="$ec2_tag_service" -e ec2_tag_team="$ec2_tag_team"  -e ec2_count="$ec2_count"
+---
+- hosts: localhost
+  roles:
+    - { role: "create_ami" }
+    - { role: "ec2up", ami_id: "{{ create_ami_info.image_id }}" }
+    

@@ -1,0 +1,11 @@
+---
+- name: Print ASGs except the top {{ count }}
+  debug:
+   msg: "{{ asg_name[count|int:] }}"
+
+- name: Delete ASGs except top {{ count }}
+  ec2_asg:
+   name: "{{ item }}"
+   state: absent
+   region: "{{region}}"
+  with_items: "{{ asg_name[count|int:] }}"

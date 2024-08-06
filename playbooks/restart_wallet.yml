@@ -1,0 +1,25 @@
+# Generic Playbook for Rolling restart of api instances
+# Notes:
+#   - instance_de_register --> Role for de-registering instances from elb.
+#   - instance_register --> Role for registering instances to elb.
+# Example invocation:
+#   ansible-playbook -vvv /etc/ansible/playbooks/restart_wallet.yml -f 5 -e cluster_name="$cluster_name"  -e ec2_elbs_out="$ec2_elbs_out_list" -e ec2_elbs_in="$ec2_elbs_in_list" -e num_deploy_host=1
+
+- hosts: "{{ cluster_name }}"
+  remote_user: "ubuntu"
+  vars:
+    ansible_ssh_port: "22"
+    ansible_ssh_private_key_file: "~/.ssh/newigpkeys/{{ key_name }}.pem"
+  serial: "{{ num_deploy_host }}"
+
+  tasks:
+   - name: include Instance-De-register role
+     include_role:
+      name: instance_de_register
+
+   - name: restart wallet api service
+     shell: sleep 10 ; sudo service wallet-api restart ; sleep 10
+
+   - name: include Instance-Register role
+     include_role:
+      name: instance_register

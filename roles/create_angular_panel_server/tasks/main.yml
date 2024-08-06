@@ -1,0 +1,48 @@
+    - name: Update all packages
+      dnf:
+        name: '*'
+        state: latest 
+
+    - name: Install required packages
+      dnf:
+        name: 
+          - httpd
+          - git
+        state: present
+
+    - name: Start httpd service
+      systemd:
+        name: httpd
+        state: started
+        enabled: yes
+
+    - name: Download and install NVM
+      become: yes
+      shell: |
+        curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.1/install.sh | bash
+        source ~/.nvm/nvm.sh
+        nvm install {{node_version}}
+      args:
+        executable: /bin/bash
+
+    - name: clone repo and checkout to a branch
+      git:
+        repo: 'https://{{ git_username }}:{{ git_password }}@github.com/igphub/{{repo_name}}.git'
+        dest: '{{build_path}}/{{repo_name}}' 
+        version: '{{checkout_branch}}'
+    
+    - name: Install npm dependencies
+      command: 
+        cmd: /bin/bash -c "source ~/.nvm/nvm.sh && npm i"
+        chdir: '{{build_path}}/{{repo_name}}'
+
+    - name: Build the project
+      command: 
+        cmd: /bin/bash -c "source ~/.nvm/nvm.sh && npm run build" 
+        chdir: '{{build_path}}/{{repo_name}}'
+
+    - name: Copy build files
+      copy:
+        src: '{{build_path}}/{{repo_name}}/dist/admin-panel/'
+        dest: '{{build_path}}'
+        remote_src: yes

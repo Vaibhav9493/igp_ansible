@@ -1,0 +1,2 @@
+#!/bin/bash
+cd /opt/fe/; git reset --hard; git clean -fd; git pull; node -r dotenv/config compile.js; node -r dotenv/config build.js

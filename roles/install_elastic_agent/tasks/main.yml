@@ -1,0 +1,18 @@
+---
+- name: gather information about all AMIs with tag key Name and value webapp
+  amazon.aws.ec2_ami_info:
+    region: us-east-1
+    filters:
+      "tag:Name": "{{ami_tag_name}}"
+  register: amis
+
+#- name: print out AMIs to terminal window
+#  debug:
+#    var: AMIs
+
+- name:  print out ami instance id
+  vars:
+    server01_ami: "{{ amis.images | selectattr('name', 'defined') | sort(attribute='creation_date') | last }}"
+  debug:
+    msg: "{{server01_ami.image_id}}"
+

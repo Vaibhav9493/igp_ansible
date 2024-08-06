@@ -1,0 +1,18 @@
+# Playbook to creating fresh uat/test angular-panel server.
+# Notes:
+#   - ec2up --> Role for launching a ec2 instance
+#   - create_angular_panel_server --> Role for creating test/uat angular panel server
+
+# Example invocation for creating fresh angular-panel server:
+#   ansible-playbook -vvv /etc/ansible/playbooks/create_angular_panel_server.yml -e deployment_stack="$deployment_stack" -e region="$region" -e ec2_tag_Name="$ec2_tag_Name"  -e ec2_sg_id="$ec2_sg_id" -e ec2_key_name="$ec2_key_name" -e ec2_tag_environment="$ec2_tag_environment" -e processor_type="$processor_type" -e ec2_instance_type="$ec2_instance_type" -e ec2_tag_cluster="$ec2_tag_cluster" -e ec2_tag_service="$ec2_tag_service"   -e ec2_volume_size="$ec2_volume_size"  -e ec2_tag_os_user="$ec2_tag_os_user" -e ec2_tag_team="$ec2_tag_team" -e ec2_count="$ec2_count" -e ec2_subnet_id="$ec2_subnet_id" -e graviton_ec2_ami_id="$graviton_ec2_ami_id" -e intel_ec2_ami_id="$intel_ec2_ami_id" -e repo_name="$repo_name" -e checkout_branch="$checkout_branch"  -e git_username="$git_username"  -e git_password="$git_password" -e node_version="$node_version"  -e build_path="$build_path" 
+---
+- name: launch instance
+  hosts: localhost
+  roles:
+    - { role: "ec2up" }
+
+- hosts: launched-instances
+  gather_facts: true
+  become: true
+  roles: 
+    - { role: "create_angular_panel_server"}

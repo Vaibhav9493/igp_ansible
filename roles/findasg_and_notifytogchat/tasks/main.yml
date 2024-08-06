@@ -1,0 +1,13 @@
+---
+# Notes:
+#   - find_asg --> Role for getting the asgs.
+#   - notify_to_gchat  -->  Role for sending message to google chat.
+
+- include_role:
+    name: find_asg
+
+- include_role:
+    name: notify_to_gchat
+  vars:
+      message: "Latest ASG *{{(asgs.results|sort(reverse=true, attribute='created_time')).0.auto_scaling_group_name}}* is not active i.e this ASG has 0 instance. \nPlease delete this ASG."
+  when: (asgs.results | sort(reverse=true, attribute='created_time')).0.instances | length == 0

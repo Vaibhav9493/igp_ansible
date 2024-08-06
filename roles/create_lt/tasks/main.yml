@@ -1,0 +1,32 @@
+---
+- name: create userdata
+  local_action:
+     module: ansible.builtin.template
+     src: "{{ deployment_stack }}.j2"
+     dest: "/etc/ansible/roles/create_lt/files/{{deployment_stack}}-{{start_job_build_number}}"
+     owner: jenkins
+     group: jenkins
+     mode: 0644
+
+- name: Create an ec2 launch template
+  local_action:
+     module: community.aws.ec2_launch_template
+     name: "{{lt_name}}"
+     default_version: "{{lt_version}}"
+     image_id: "{{ami_id}}"
+     key_name: "{{ec2_key_pair}}"
+     iam_instance_profile: "{{ec2_instance_profile}}"
+     user_data: "{{lookup('file', '/etc/ansible/roles/create_lt/files/'+deployment_stack+'-'+start_job_build_number) | b64encode }}"
+     security_group_ids: "{{ec2_sg_id}}"
+     state: "present"
+     region: "us-east-1"
+     tags:
+       Name: "{{ec2_tag_Name}}"
+       environment: "{{ec2_tag_environment}}"
+       cluster: "{{ec2_tag_cluster}}"
+       os: "{{ec2_tag_os}}"
+       os_user: "{{ec2_tag_os_user}}"
+       ssh_port: "{{ec2_tag_ssh_port}}"
+       service: "{{ec2_tag_service}}"
+       team: "{{ec2_tag_team}}"
+       app_version: "{{ec2_tag_app_version}}"

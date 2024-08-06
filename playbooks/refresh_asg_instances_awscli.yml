@@ -1,0 +1,10 @@
+# Generic Playbook for creating Autoscaling policy
+# Notes:
+#   - refresh_asg_instances_awscli --> Role for refreshing autoscaling group instances using awscli.
+# Example invocation:
+#   ansible-playbook -vvv /etc/ansible/playbooks/refresh_asg_instances_awscli.yml -e asg_name="$asg_name" -e asg_region="$asg_region" -e instance_warmup="$instance_warmup" -e min_healthy_percentage="$min_healthy_percentage" -e scale_in_protected_instances:"Refresh"|"Ignore"|"Wait" -e standby_instances:"Terminate"|"Ignore"|"Wait" -e skip_matching:"true|false"
+
+- hosts: "localhost"
+  roles:
+    - { role: "refresh_asg_instances_awscli" }
+

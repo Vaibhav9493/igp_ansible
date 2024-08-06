@@ -1,0 +1,39 @@
+---
+    - name: Get current working directory
+      command: pwd
+      register: pwd_output
+    
+    - name: clone repo and checkout to a branch
+      git:
+        repo: 'https://{{ git_username }}:{{ git_password }}@github.com/igphub/{{repo_name}}.git'
+        dest: '{{pwd_output.stdout}}/{{repo_name}}' 
+        version: '{{checkout_branch}}'
+        
+    - name: run mvn build command
+      shell: 
+        cmd: '/opt/apache-maven-3.6.3/bin/mvn clean install -DskipTests'
+        chdir: '{{pwd_output.stdout}}/{{repo_name}}'
+
+    - name: Copy {{name_of_jar_file}} file
+      copy:
+        src: "{{pwd_output.stdout}}/{{repo_name}}/{{path_to_jar_file}}/{{name_of_jar_file}}"
+        dest: "/opt/jars/distribution.jar"
+        remote_src: yes
+        force: yes
+
+    - name: Enable {{ deployment_stack | regex_replace('(-u|-t|-p).*', '') }} service
+      systemd:
+        name: "{{service_file}}.service"
+        state: started
+        enabled: yes
+
+    - name: Restart {{ deployment_stack | regex_replace('(-u|-t|-p).*', '') }} service
+      systemd:
+        name: "{{service_file}}.service"
+        state: restarted
+        daemon_reload: yes
+       
+    - name: Remove repository
+      file:
+        path: '{{pwd_output.stdout}}/{{repo_name}}' 
+        state: absent

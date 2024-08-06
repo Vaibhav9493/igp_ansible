@@ -1,0 +1,16 @@
+# Playbook for adding annonation to apm service.
+# Notes:
+#   - post_request --> Role to post a request.
+# Example invocation:
+# ansible-playbook -vvv /etc/ansible/playbooks/annotation_to_apm_service.yml  -e deployment_stack="$deployment_stack" -e apm_app_version="$apm_app_version" -e build_timestamp="$build_timestamp" -e apm_environment="$apm_environment" 
+
+---
+- hosts: localhost
+  vars:
+    formated_timestamp: "{{ build_timestamp[:4] + '-' + build_timestamp[4:6] + '-' + build_timestamp[6:8] + 'T' + build_timestamp[8:10] + ':' + build_timestamp[10:12] + ':' + build_timestamp[12:14] + '.000Z' }}"
+    url: "https://kibana.joinventures.com/api/apm/services/{{deployment_stack}}/annotation"
+    headers: '{"Content-Type": "application/json", "kbn-xsrf": "true", "Authorization": "ApiKey YlBnTjBvNEJDYVhKSWxDeFoyZkE6WnlBd3QtdDlRNWk3Z0JhSkRDal84dw=="}'
+    body_format: json
+    body: '{"@timestamp": "{{formated_timestamp}}", "service": {"version": "{{apm_app_version}}", "environment": "{{apm_environment}}"}}'
+  roles:
+    - { role: "post_request" }

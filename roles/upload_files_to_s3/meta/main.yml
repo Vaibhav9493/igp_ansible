@@ -1,0 +1,8 @@
+---
+galaxy_info:
+  author: Manasi Naik
+  description: Role for uploading multiple files to s3 bucket.
+  company: IGP
+  license: GPL
+  min_ansible_version: 2.0
+dependencies: []

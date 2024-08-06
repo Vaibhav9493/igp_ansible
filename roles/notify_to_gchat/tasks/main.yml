@@ -1,0 +1,10 @@
+---
+    - name: Send message to Google Chat
+      uri:
+        url: "{{google_chat_webhook}}"
+        method: POST
+        body_format: json
+        headers:
+          Content-Type: "application/json"
+        body:
+          text: "{{message}}"

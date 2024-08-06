@@ -1,0 +1,7 @@
+-  name: Post request
+   uri:
+    url: "{{url}}"
+    method: POST
+    headers: "{{headers}}"
+    body_format: "{{body_format}}"
+    body: "{{body}}"

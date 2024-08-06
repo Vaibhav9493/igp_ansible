@@ -1,0 +1,6 @@
+---
+# tasks file for /etc/ansible/roles/get-all-lts
+- name: List all launch templates sorted by creation time
+  shell: "aws ec2 describe-launch-templates --filters Name=launch-template-name,Values={{ ltname }} --query 'LaunchTemplates[*].[LaunchTemplateName,CreateTime]' --output text | sort -k2 -r "
+  register: launch_templates
+

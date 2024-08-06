@@ -1,0 +1,13 @@
+tg_name: igp-test-tg
+tg_protocol: http
+tg_port: 80
+tg_healthcheck_protocol: http
+tg_healthcheck_path: /healthcheck
+tg_healthcheck_port: 80
+tg_healthcheck_success_response_code: 200
+tg_healthcheck_interval: 6
+tg_healthcheck_timeout: 5
+tg_healthcheck_healthy_count: 2
+tg_healthcheck_unhealthy_count: 10
+tg_region: us-east-1
+tg_deregistration_delay_timeout: 300

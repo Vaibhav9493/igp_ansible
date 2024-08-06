@@ -1,0 +1,9 @@
+# Generic Playbook for finding alb information
+# Notes:
+#   - find_alb_info --> Role for finding alb information.
+# Example invocation:
+#   ansible-playbook -vvv /etc/ansible/playbooks/find_alb_info.yml -e alb_name_list="$alb_name_list" -e alb_region="$alb_region"
+
+- hosts: "localhost"
+  roles:
+    - { role: "find_alb_info" }

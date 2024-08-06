@@ -1,0 +1,78 @@
+    - name: Update all packages
+      dnf:
+        name: '*'
+        state: latest 
+      become: true
+
+    - name: Install required packages
+      dnf:
+        name: 
+          - epel-release
+          - git
+          - wget
+          - unzip
+        state: present
+      become: true
+
+    - name: Install s3cmd 
+      dnf:
+        name: s3cmd
+      become: true
+
+    - name: Make directory jars and properties
+      file:
+        path: "{{ item }}"
+        state: directory
+        owner: rocky
+        group: rocky
+        mode: '0755'
+      loop:
+        - /opt/jars
+        - /opt/properties
+      become: true
+
+    - name: Install java
+      dnf:
+        name:
+          - java-{{java_version}}-openjdk
+          - java-{{java_version}}-openjdk-devel
+        state: present
+      become: true
+
+    - name: Download apache-maven-3.6.3-bin.zip
+      get_url:
+        url: https://archive.apache.org/dist/maven/maven-3/3.6.3/binaries/apache-maven-3.6.3-bin.zip
+        dest: /tmp/apache-maven-3.6.3-bin.zip
+
+    - name: Unzip apache-maven-3.6.3-bin.zip
+      unarchive:
+        src: /tmp/apache-maven-3.6.3-bin.zip
+        dest: /opt
+        remote_src: yes
+      become: true
+
+    - name: Add apache-maven-3.6.3/bin to PATH in .bashrc
+      lineinfile:
+        path: ~/.bashrc
+        line: 'export PATH=$PATH:/opt/apache-maven-3.6.3/bin'
+        state: present
+
+    - name: Add service file
+      template:
+        src: "{{ deployment_stack | regex_replace('(-u|-t|-p).*', '') }}.service"
+        dest: /etc/systemd/system/{{service_file}}.service
+      become: true
+
+    - name: Download the latest elastic-apm-agent.jar 
+      shell: |
+        cd /opt/jars/
+        sudo curl -o 'elastic-apm-agent.jar' -L 'https://oss.sonatype.org/service/local/artifact/maven/redirect?r=releases&g=co.elastic.apm&a=elastic-apm-agent&v=LATEST'
+        sudo chown rocky:rocky elastic-apm-agent.jar
+
+    - name: Pull {{deployment_stack}} properties files from S3
+      shell: |
+        s3cmd get --recursive --progress --force s3://deploymentstack-files/backend/{{ deployment_stack | regex_replace('(-u|-t|-p).*', '') }}/{{deployment_stack}} /tmp/
+        cp -rf /tmp/{{deployment_stack}}/* /opt/properties/
+
+
+

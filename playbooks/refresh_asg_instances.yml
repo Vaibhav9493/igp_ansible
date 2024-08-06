@@ -1,0 +1,10 @@
+# Generic Playbook for creating Autoscaling policy
+# Notes:
+#   - refresh_asg_instances --> Role for refreshing autoscaling group instances.
+# Example invocation:
+#   ansible-playbook -vvv /etc/ansible/playbooks/refresh_asg_instances.yml -e asg_name="$asg_name" -e asg_region="$asg_name" -e instance_warmup="$instance_warmup" -e min_healthy_percentage="$min_healthy_percentage"
+
+- hosts: "localhost"$
+  roles:
+    - { role: "refresh_asg_instances" }
+

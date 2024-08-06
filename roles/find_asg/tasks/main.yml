@@ -1,0 +1,8 @@
+---
+- name: Find a group with matching tags
+  local_action:
+    module: amazon.aws.autoscaling_group_info
+    tags:
+      service: "{{ service }}"
+    region: "{{ asg_region }}"
+  register: "asgs"

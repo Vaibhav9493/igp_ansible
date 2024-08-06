@@ -1,0 +1,50 @@
+#!/bin/bash
+
+deployment_arch="{{ deployment_arch }}"
+
+# Pull latest JSON files from S3
+s3cmd get --recursive --progress --force s3://fejsons/latest /tmp/
+
+#Copy sitemap files.
+cp -rf /tmp/latest/* /etc/json/
+cp -rf /etc/json/sitemap/sitemap.xml /opt/fe/public/
+cp -rf /etc/json/sitemap/sitemap_cards_0.xml /opt/fe/public/
+cp -rf /etc/json/sitemap/sitemap_search_0.xml /opt/fe/public/
+cp -rf /etc/json/sitemap/sitemap_products_0.xml /opt/fe/public/
+
+#Restart FE service
+export NVM_DIR="/root/.nvm"
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
+[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
+cd /opt/fe
+/root/.nvm/versions/node/v14.18.2/bin/node /root/.nvm/versions/node/v14.18.2/lib/node_modules/forever/bin/forever -r dotenv/config stop app.js
+/root/.nvm/versions/node/v14.18.2/bin/node /root/.nvm/versions/node/v14.18.2/lib/node_modules/forever/bin/forever -r dotenv/config start app.js
+
+# Enroll Elastic Agent to Fleet server
+cd /tmp
+
+if [[ "$deployment_arch" == "intel" ]]
+then
+
+curl -L -O https://artifacts.elastic.co/downloads/beats/elastic-agent/elastic-agent-{{elastic_agent_version}}-linux-x86_64.tar.gz
+tar xzvf elastic-agent-{{elastic_agent_version}}-linux-x86_64.tar.gz
+cd elastic-agent-{{elastic_agent_version}}-linux-x86_64
+echo y | ./elastic-agent install --url="{{ elastic_fleet_url }}" --enrollment-token="{{ elastic_fleet_enrolment_token }}"  --tag="{{ elastic_fleet_tags }}"
+#echo y | elastic-agent enroll --url="{{ elastic_fleet_url }}" --enrollment-token="{{ elastic_fleet_enrolment_token }}"  --tag="{{ elastic_fleet_tags }}"
+
+elif [[ "$deployment_arch" == "graviton" ]]
+then
+
+curl -L -O https://artifacts.elastic.co/downloads/beats/elastic-agent/elastic-agent-{{elastic_agent_version}}-linux-arm64.tar.gz
+tar xzvf elastic-agent-{{elastic_agent_version}}-linux-arm64.tar.gz
+cd elastic-agent-{{elastic_agent_version}}-linux-arm64
+echo y | ./elastic-agent install --url="{{ elastic_fleet_url }}" --enrollment-token="{{ elastic_fleet_enrolment_token }}"  --tag="{{ elastic_fleet_tags }}"
+#echo y | elastic-agent enroll --url="{{ elastic_fleet_url }}" --enrollment-token="{{ elastic_fleet_enrolment_token }}"  --tag="{{ elastic_fleet_tags }}"
+
+fi
+
+# Restart Elastic Agent
+systemctl restart elastic-agent
+
+# Restart Rsyslog service
+systemctl restart rsyslog

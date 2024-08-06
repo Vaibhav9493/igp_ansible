@@ -1,0 +1,9 @@
+---
+- name: Get all ASGs 
+  ec2_asg_info:
+   region: "{{ region }}"
+  register: asgs
+
+- name: Get Name of ASGs sorted by creation time [new - old ]
+  set_fact:
+   asg_name: "{{ asgs.results | selectattr('auto_scaling_group_name', 'match', asgname ) | list | sort(attribute='created_time') | map(attribute='auto_scaling_group_name') | reverse | list }}"

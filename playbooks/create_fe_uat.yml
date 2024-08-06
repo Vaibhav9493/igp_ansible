@@ -1,0 +1,31 @@
+#  Playbook to create fresh uat server
+# Notes:
+#   - ec2up --> Role for creating the EC2 instances. 
+#   - install_dependency_fe_uat --> Role for install packages.
+#   - upload_fe_configuration_file --> Role for upload build files
+# Example invocation:
+#ansible-playbook -vvv /etc/ansible/playbooks/create_fe_uat.yml -e depolyment_stack="$depolyment_stack" -e region="$region" -e ec2_tag_Name="$ec2_instance_name" -e ec2_instance_profile="$ec2_instance_profile"  -e ec2_sg_id="$ec2_sg_id" -e ec2_key_name="$ec2_key_name" -e processor_type="$processor_type" -e ec2_instance_type="$ec2_instance_type" -e ec2_tag_cluster="$ec2_instance_name" -e ec2_tag_service="$ec2_instance_name" -e ec2_volume_size="$ec2_volume_size" -e ec2_tag_environment="$ec2_tag_environment" -e ec2_tag_os_user="$ec2_tag_os_user" -e checkout_branch="$checkout_branch" -e git_username="$git_username" -e git_password="$git_password" 
+---
+- name: crete ec2 instance
+  hosts: localhost
+  roles: 
+      - { role: "ec2up" }
+
+- name: depolyment and build on fresh server 
+  hosts: launched-instances
+  become: yes
+  tasks:
+     - name: role to upload configuration file
+       include_role:
+         name: "install_dependency_fe_uat"
+
+     - name: run the script of pull-and-build.sh
+       shell: |
+        export PATH=/root/.nvm/versions/node/v14.18.2/bin:$PATH
+        sh /root/scripts/pull-and-build.sh
+
+     - name: role to upload configuration file
+       include_role:
+         name: "upload_fe_configuration_files"
+
+      

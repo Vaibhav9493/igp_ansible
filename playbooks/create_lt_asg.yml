@@ -1,0 +1,10 @@
+# Generic Playbook for creating Autoscaling Group.
+# Notes:
+#   - create_lt_asg --> Role for creating the Autoscaling Group.
+# Example invocation:
+#   ansible-playbook -vvv /etc/ansible/playbooks/create_lt_asg.yml -e ec2_tag_Name="$ec2_tag_Name" -e ec2_tag_environment="$ec2_tag_environment" -e ec2_tag_cluster="$ec2_tag_cluster" -e ec2_tag_service="$ec2_tag_service" -e ec2_tag_team="$ec2_tag_team" -e ec2_tag_version="$ec2_tag_app_version" -e ec2_tag_os_user="$ec2_tag_os_user" -e ec2_tag_ssh_port="$ec2_tag_ssh_port" -e lt_name="$lt_name" -e lt_version="$lt_version" -e ec2_tag_os="$ec2_tag_os" -e asg_name="$asg_name" -e asg_base_size="$asg_base_size" -e asg_above_base_percent="$asg_above_base_percent" -e asg_min_size="$asg_min_size" -e asg_max_size="$asg_max_size" -e asg_desired_size="$asg_desired_size" -e asg_health_check_type="$asg_health_check_type" -e asg_region="$asg_region" -e asg_health_check_period="$asg_health_check_period" -e asg_vpc_subnets="$asg_vpc_subnets" -e asg_capacity_rebalance="$asg_capacity_rebalance" -e lb_type="$lb_type" -e lb_entity="$lb_entity" -e instance_type_list="$instance_type_list" -e on_demand_allocation_strategy="$on_demand_allocation_strategy" -e spot_allocation_strategy="$spot_allocation_strategy"
+
+- hosts: "localhost"
+  roles:
+    - { role: "create_lt_asg" }
+

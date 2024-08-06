@@ -1,0 +1,23 @@
+# Playbook to creating fresh be-server for uat/test
+# Notes:
+#   - ec2up --> Role for launching a ec2 instance
+#   - install_dependence_be_uat --> Role for installing the basic dependencies needed for new server
+#   - build_on_be_uat --> Role for deploying new build on server
+
+# Example invocation for creating fresh be server:
+#   ansible-playbook -vvv /etc/ansible/playbooks/deployment_for_be_server.yml -e deployment_stack="$deployment_stack" -e region="$region" -e ec2_tag_Name="$ec2_tag_Name" -e ec2_instance_profile="$ec2_instance_profile"  -e ec2_sg_id="$ec2_sg_id" -e ec2_key_name="$ec2_key_name" -e processor_type="$processor_type" -e ec2_instance_type="$ec2_instance_type" -e ec2_tag_cluster="$ec2_tag_cluster" -e ec2_tag_service="$ec2_tag_service"   -e ec2_volume_size="$ec2_volume_size"  -e ec2_tag_os_user="$ec2_tag_os_user" -e ec2_count="$ec2_count" -e ec2_subnet_id="$ec2_subnet_id" -e graviton_ec2_ami_id="$graviton_ec2_ami_id" -e intel_ec2_ami_id="$intel_ec2_ami_id" -e repo_name="$repo_name" -e checkout_branch="$checkout_branch" -e service_file="$service_file" -e name_of_jar_file="$name_of_jar_file" -e path_to_jar_file="$path_to_jar_file"  -e git_username="$git_username"  -e git_password="$git_password" -e java_version="$java_version"
+# Example invocation for taking build on be server:
+#   ansible-playbook -vvv /etc/ansible/playbooks/deployment_for_be_server.yml -e deployment_stack="$deployment_stack" -e ec2_tag_os_user="$ec2_tag_os_user" -e git_username="$git_username" -e git_password="$git_password" -e checkout_branch="$checkout_branch" -e private_ip_address="$private_ip_address" -e region="$region" -e ec2_key_name="$ec2_key_name" -e  repo_name="$repo_name" -e name_of_jar_file="$name_of_jar_file" -e path_to_jar_file="$path_to_jar_file" 
+---
+- name: launch instance
+  hosts: localhost
+  roles:
+    - { role: "ec2up" }
+
+- hosts: launched-instances
+  gather_facts: true
+  become: true
+  roles:
+    - role: "install_dependence_be_uat"
+      when: private_ip_address is not defined
+    - { role: "build_on_be_uat" }

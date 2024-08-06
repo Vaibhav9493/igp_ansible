@@ -1,0 +1,10 @@
+# Playbook to delete the ami's.
+# Notes:
+#   - delete-amis --> Role to delete the ami's.
+# Example invocation:
+# ansible-playbook /etc/ansible/playbooks/delete-ami.yml  -e region="$region" -e ami_id_list="$ami_id_list"
+
+- hosts: localhost
+  gather_facts: False
+  roles:
+    - { role: "delete-amis", ami_ids: "{{ami_id_list.split(',')}}" }

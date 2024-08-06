@@ -1,0 +1,7 @@
+---
+- name: Gather information about a particular ALB
+  local_action:
+    module: "amazon.aws.elb_application_lb_info"
+    region: "{{ alb_region }}"
+    names: "{{ alb_name.split(',') }}"
+  register: albinfo

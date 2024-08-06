@@ -1,0 +1,15 @@
+---
+galaxy_info:
+  author: Harsimran Singh
+  description: Role for creatinng AWS ASG from LT for IGP.
+  company: IGP
+  license: GPL
+  platforms:
+  - name: Amazon
+    versions:
+    - 6
+  - name: EL
+    versions:
+    - 6
+    - 7
+dependencies: []

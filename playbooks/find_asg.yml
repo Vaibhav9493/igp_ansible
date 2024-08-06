@@ -1,0 +1,10 @@
+# Generic Playbook for creating Autoscaling policy
+# Notes:
+#   - find_asg --> Role for finding autoscaling group.
+# Example invocation:
+#   ansible-playbook -vvv /etc/ansible/playbooks/find_asg.yml -e service="$service" -e asg_region="$asg_region"
+
+- hosts: "localhost"
+  roles:
+    - { role: "find_asg" }
+

@@ -1,0 +1,9 @@
+# Generic Playbook to modify alb listeners
+# Notes:
+#   - refresh_asg_instances_awscli --> Role for refreshing autoscaling group instances using awscli.
+# Example invocation:
+#   ansible-playbook -vvv /etc/ansible/playbooks/modify_alb_listeners.yml -e alb_region="$alb_region" -e listener_arn="$listener_arn" -e target_group_arn_100="$target_group_arn_100" -e target_group_arn_0="$target_group_arn_0"
+
+- hosts: "localhost"
+  roles:
+    - { role: "modify_alb_listeners" }

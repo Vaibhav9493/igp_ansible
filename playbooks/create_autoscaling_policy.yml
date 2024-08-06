@@ -1,0 +1,10 @@
+# Generic Playbook for creating Autoscaling policy
+# Notes:
+#   - create_autoscaling_policy --> Role for creating the Autoscaling policy.
+# Example invocation:
+#   ansible-playbook -vvv /etc/ansible/playbooks/create_autoscaling_policy.yml -e asp_name="$asp_name" -e asp_target_value="$asp_target_value" -e asg_name="$asg_name"
+
+- hosts: "localhost"$
+  roles:
+    - { role: "create_autoscaling_policy" }
+

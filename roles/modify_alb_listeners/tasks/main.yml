@@ -1,0 +1,14 @@
+---
+- name: create alb modify config
+  local_action:
+     module: ansible.builtin.template
+     src: "config.json.j2"
+     dest: "/etc/ansible/roles/modify_alb_listeners/files/config.json"
+     owner: jenkins
+     group: jenkins
+     mode: 0644
+
+- name: Modify alb listener
+  local_action:
+     module: shell aws elbv2 modify-listener --cli-input-json file:///etc/ansible/roles/modify_alb_listeners/files/config.json --region {{ alb_region }}
+

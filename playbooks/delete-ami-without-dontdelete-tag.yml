@@ -1,0 +1,12 @@
+# Playbook to delete the ami's that dont have "dont-delete=true" tag.
+# Notes:
+#   - find_ami --> Role to get list of ami's.
+#   - delete-amis --> Role to delete the listed ami's.
+# Example invocation:
+# ansible-playbook /etc/ansible/playbooks/delete-ami-without-dontdelete-tag.yml  -e start_time="$start_time" -e end_time="$end_time" -e region="$region"
+
+- hosts: localhost
+  gather_facts: False
+  roles:
+    - { role: "find_ami", filters: {"image-type": "machine", "is-public": "false"} }
+    - { role: "delete-amis", ami_ids: "{{ ami_list.images | selectattr('creation_date', '>=', start_time) | selectattr('creation_date', '<=', end_time) | selectattr('tags.dont_delete', 'undefined') | map(attribute='image_id')  | list }}" }

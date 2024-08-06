@@ -1,0 +1,8 @@
+---
+galaxy_info:
+  author: Manasi Naik
+  description: Role for getting all the launch templates sorted them according to creation time.
+  company: IGP
+  license: GPL
+  min_ansible_version: 2.0
+dependencies: []

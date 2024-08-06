@@ -1,0 +1,17 @@
+region=us-east-1
+ec2_tag_Name=test-uat-ps24-fe
+ec2_instance_profile=igp-ec2-profile-prod
+ec2_sg_id=sg-2fa5af5d,sg-e333f598
+ec2_key_name=igp-prod-fe
+processor_type=intel
+ec2_instance_type=t3.medium
+ec2_tag_cluster=test-uat-ps24-fe
+ec2_tag_service=test-uat-ps24-fe
+ec2_volume_size=80
+ec2_tag_environment=testing
+ec2_tag_os_user=rocky
+build_server_private_ip_address=$build_server_private_ip_address
+repo=fe
+deployment_stack=$deployment_stack
+git_username=$git_username
+git_password=$git_password

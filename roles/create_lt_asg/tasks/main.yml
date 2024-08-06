@@ -1,0 +1,116 @@
+---
+- name: create asg with elb
+  local_action:
+     module: community.aws.ec2_asg
+     name: "{{asg_name}}"
+     launch_template:
+       version: "{{lt_version}}"
+       launch_template_name: "{{lt_name}}"
+     mixed_instances_policy:
+       instance_types: "{{ instance_type_list.split(',') }}"
+       instances_distribution:
+         on_demand_base_capacity: "{{asg_base_size}}"
+         on_demand_percentage_above_base_capacity: "{{asg_above_base_percent}}"
+         on_demand_allocation_strategy: "{{on_demand_allocation_strategy}}"
+         spot_allocation_strategy: "{{spot_allocation_strategy}}"
+         spot_instance_pools: "{{{ ((instance_type_list.split(',')|length) * (asg_vpc_subnets.split(',')|length)) if spot_allocation_strategy == 'lowest-price' else omit }}"
+     min_size: "{{asg_min_size}}"
+     max_size: "{{asg_max_size}}"
+     desired_capacity: "{{asg_desired_size}}"
+     load_balancers: "{{ lb_entity.split(',') }}"
+     health_check_type: "{{asg_health_check_type}}"
+     health_check_period: "{{asg_health_check_period}}"
+     vpc_zone_identifier: "{{ asg_vpc_subnets.split(',') }}"
+     termination_policies: "NewestInstance"
+     wait_for_instances: "yes"
+     region: "{{ asg_region }}"
+     tags:
+       - Name: "{{ec2_tag_Name}}"
+       - environment: "{{ec2_tag_environment}}"
+       - cluster: "{{ec2_tag_cluster}}"
+       - os: "{{ec2_tag_os}}"
+       - os_user: "{{ec2_tag_os_user}}"
+       - ssh_port: "{{ec2_tag_ssh_port}}"
+       - service: "{{ec2_tag_service}}"
+       - team: "{{ec2_tag_team}}"
+       - app_version: "{{ec2_tag_app_version}}"
+  when: lb_type == "elb" and lb_entity != "none"
+
+- name: create asg with alb
+  local_action:
+    module: community.aws.ec2_asg
+    name: "{{asg_name}}"
+    launch_template:
+      version: "{{lt_version}}"
+      launch_template_name: "{{lt_name}}"
+    mixed_instances_policy:
+      instance_types: "{{ instance_type_list.split(',') }}"
+      instances_distribution:
+        on_demand_base_capacity: "{{asg_base_size}}"
+        on_demand_percentage_above_base_capacity: "{{asg_above_base_percent}}"
+        on_demand_allocation_strategy: "{{on_demand_allocation_strategy}}"
+        spot_allocation_strategy: "{{spot_allocation_strategy}}"
+        spot_instance_pools: "{{ ((instance_type_list.split(',')|length) * (asg_vpc_subnets.split(',')|length)) if spot_allocation_strategy == 'lowest-price' else omit }}"
+    min_size: "{{asg_min_size}}"
+    max_size: "{{asg_max_size}}"
+    desired_capacity: "{{asg_desired_size}}"
+    target_group_arns: "{{ lb_entity.split(',') }}"
+    health_check_type: "{{asg_health_check_type}}"
+    health_check_period: "{{asg_health_check_period}}"
+    vpc_zone_identifier: "{{ asg_vpc_subnets.split(',') }}"
+    termination_policies: "NewestInstance"
+    wait_for_instances: "yes"
+    region: "{{ asg_region }}"
+    tags:
+      - Name: "{{ec2_tag_Name}}"
+      - environment: "{{ec2_tag_environment}}"
+      - cluster: "{{ec2_tag_cluster}}"
+      - os: "{{ec2_tag_os}}"
+      - os_user: "{{ec2_tag_os_user}}"
+      - ssh_port: "{{ec2_tag_ssh_port}}"
+      - service: "{{ec2_tag_service}}"
+      - team: "{{ec2_tag_team}}"
+      - app_version: "{{ec2_tag_app_version}}"
+  when: lb_type == "alb" and lb_entity != "none"
+
+- name: create asg without lb
+  local_action:
+    module: community.aws.ec2_asg
+    name: "{{asg_name}}"
+    launch_template:
+      version: "{{lt_version}}"
+      launch_template_name: "{{lt_name}}"
+    mixed_instances_policy:
+      instance_types: "{{ instance_type_list.split(',') }}"
+      instances_distribution:
+        on_demand_base_capacity: "{{asg_base_size}}"
+        on_demand_percentage_above_base_capacity: "{{asg_above_base_percent}}"
+        on_demand_allocation_strategy: "{{on_demand_allocation_strategy}}"
+        spot_allocation_strategy: "{{spot_allocation_strategy}}"
+        spot_instance_pools: "{{ ((instance_type_list.split(',')|length) * (asg_vpc_subnets.split(',')|length)) if spot_allocation_strategy == 'lowest-price' else omit }}"
+    min_size: "{{asg_min_size}}"
+    max_size: "{{asg_max_size}}"
+    desired_capacity: "{{asg_desired_size}}"
+    health_check_type: "{{asg_health_check_type}}"
+    health_check_period: "{{asg_health_check_period}}"
+    vpc_zone_identifier: "{{asg_vpc_subnets.split(',')}}"
+    termination_policies: "NewestInstance"
+    wait_for_instances: "yes"
+    region: "{{asg_region}}"
+    tags:
+      - Name: "{{ec2_tag_Name}}"
+      - environment: "{{ec2_tag_environment}}"
+      - cluster: "{{ec2_tag_cluster}}"
+      - os: "{{ec2_tag_os}}"
+      - os_user: "{{ec2_tag_os_user}}"
+      - ssh_port: "{{ec2_tag_ssh_port}}"
+      - service: "{{ec2_tag_service}}"
+      - team: "{{ec2_tag_team}}"
+      - app_version: "{{ec2_tag_app_version}}"
+      - age: "latest"
+  when: lb_entity == "none"
+
+- name: Enable capacity re-balancing on asg
+  local_action:
+    module: shell aws autoscaling update-auto-scaling-group --capacity-rebalance --region {{asg_region}} --auto-scaling-group-name {{asg_name}}
+  when: asg_capacity_rebalance == "true"

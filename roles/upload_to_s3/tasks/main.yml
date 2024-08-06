@@ -1,0 +1,14 @@
+---
+    - name: Upload all .gz files to S3
+      aws_s3:
+        bucket: "{{ s3_bucket_name }}"
+        object: "{{s3_bucket_object_path}}/{{Year}}/{{Month}}/{{Day}}/{{Hour}}/{{ db_resource_name }}/{{ backup_file | basename }}"
+        src: "{{ backup_file }}"
+        mode: put
+      with_fileglob:
+        - "{{ backup_path }}/*.gz"
+      loop_control:
+        loop_var: backup_file
+
+    - name: Delete the uploaded files from local
+      shell: "rm -rf {{ backup_path }}/*.gz"

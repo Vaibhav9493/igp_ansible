@@ -1,0 +1,21 @@
+---
+    - name: Move files from build_files to old_build_files
+      shell: |
+        s3cmd mv s3://deploymentstack-files/frontend/build_files/{{ deployment_stack | regex_replace('(-u|-t).*', '') }}/{{ deployment_stack }}/ s3://deploymentstack-files/frontend/old_build_files/{{ deployment_stack | regex_replace('(-u|-t).*', '') }}/{{ deployment_stack }}/ --recursive
+        
+    - name: upload build files from /opt/fe to build_files
+      shell: |
+        s3cmd put --recursive  /opt/fe/build_obj.txt s3://deploymentstack-files/frontend/build_files/{{ deployment_stack | regex_replace('(-u|-t).*', '') }}/{{ deployment_stack }}/
+        s3cmd put --recursive  /opt/fe/build_obj_back.txt s3://deploymentstack-files/frontend/build_files/{{ deployment_stack | regex_replace('(-u|-t).*', '') }}/{{ deployment_stack }}/
+        s3cmd put --recursive  /opt/fe/build_copy.txt s3://deploymentstack-files/frontend/build_files/{{ deployment_stack | regex_replace('(-u|-t).*', '') }}/{{ deployment_stack }}/
+        s3cmd put --recursive  /opt/fe/build_del.txt s3://deploymentstack-files/frontend/build_files/{{ deployment_stack | regex_replace('(-u|-t).*', '') }}/{{ deployment_stack }}/
+
+    - name: Move files passets_files to old_passets_files
+      shell: |
+        s3cmd mv s3://deploymentstack-files/frontend/passets_folder/{{ deployment_stack | regex_replace('(-u|-t).*', '') }}/{{ deployment_stack }}/passets/css/ s3://deploymentstack-files/frontend/old_passets_folder/{{ deployment_stack | regex_replace('(-u|-t).*', '') }}/{{ deployment_stack }}/passets/css/ --recursiv
+        s3cmd mv s3://deploymentstack-files/frontend/passets_folder/{{ deployment_stack | regex_replace('(-u|-t).*', '') }}/{{ deployment_stack }}/passets/js/ s3://deploymentstack-files/frontend/old_passets_folder/{{ deployment_stack | regex_replace('(-u|-t).*', '') }}/{{ deployment_stack }}/passets/js/ --recursive
+
+    - name: upload passets files from /opt/fe/public/passets/ to passets_files
+      shell: |
+        s3cmd put --recursive  /opt/fe/public/passets/js/ s3://deploymentstack-files/frontend/passets_folder/{{ deployment_stack | regex_replace('(-u|-t).*', '') }}/{{ deployment_stack }}/passets/js/
+        s3cmd put --recursive  /opt/fe/public/passets/css/ s3://deploymentstack-files/frontend/passets_folder/{{ deployment_stack | regex_replace('(-u|-t).*', '') }}/{{ deployment_stack }}/passets/css/

@@ -1,0 +1,14 @@
+---
+- name: Restore database from backup
+  community.mysql.mysql_db:
+    login_user: "{{db_user}}"
+    login_password: "{{db_password}}"
+    login_host: "{{db_endpoint}}"
+    name: "{{db_name}}"
+    state: import
+    target: "{{restore_target}}"
+
+- name: Delete the {{restore_target}} from local system
+  file:
+    path: "{{restore_target}}"
+    state: absent

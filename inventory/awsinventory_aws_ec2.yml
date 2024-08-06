@@ -1,0 +1,11 @@
+# AWS inventory plugin configuration
+# Reference: https://docs.ansible.com/ansible/latest/collections/amazon/aws/aws_ec2_inventory.html
+
+plugin: amazon.aws.aws_ec2
+regions:
+    - us-east-1
+hostnames:
+    - private-ip-address
+keyed_groups:
+    - prefix: tag
+      key: tags

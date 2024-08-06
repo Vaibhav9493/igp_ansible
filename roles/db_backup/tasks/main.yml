@@ -1,0 +1,28 @@
+---
+    - name: Backup specific tables
+      mysql_db:
+        login_user: "{{db_user}}"
+        login_password: "{{db_password}}"
+        login_host: "{{db_endpoint}}"
+        name: "{{ db_names }}"
+        state: dump
+        dump_extra_args: --lock-tables=false --single-transaction --no-tablespaces --tables {{ db_resource_name }}
+        target: "{{ backup_path }}/{{db_resource_name}}-{{ db_names }}-{{Year}}{{Month}}{{Day}}{{Hour}}{{Minute}}.sql"
+      register: backup_tables
+      when:
+            - (backup_type == "specific_tables" and table_names != "all")
+
+    - name: Backup all databases or specific databases
+      mysql_db:
+        login_user: "{{db_user}}"
+        login_password: "{{db_password}}"
+        login_host: "{{db_endpoint}}"
+        name: "{{ db_resource_name }}"
+        state: dump
+        dump_extra_args: --lock-tables=false --single-transaction --no-tablespaces
+        target: "{{ backup_path }}/{{ db_resource_name }}-{{Year}}{{Month}}{{Day}}{{Hour}}{{Minute}}.sql"
+      when:
+        - backup_tables is skipped
+
+    - name: Compress all .sql files
+      shell: "gzip {{ backup_path }}/{{ db_resource_name }}*"

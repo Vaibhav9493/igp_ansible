@@ -1,0 +1,7 @@
+---
+- name: include repository tasks
+  include: repository.yml
+
+- name: include deployment task
+  include: "{{dep_package}}.yml"
+

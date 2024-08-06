@@ -1,0 +1,64 @@
+---
+ - name: Provision EC2 Box
+   local_action:
+     module: amazon.aws.ec2_instance
+     key_name: "{{ ec2_key_name }}"
+     security_groups: "{{ ec2_sg_id.split(',') }}"
+     instance_type: "{{ ec2_instance_type }}"
+     termination_protection: "{{ termination_protection }}"
+     iam_instance_profile: "{{ ec2_instance_profile if ec2_instance_profile is defined else omit }}"
+     image_id: "{{ ami_id | default(vars[processor_type + '_ec2_ami_id']) }}"
+     vpc_subnet_id: "{{ec2_subnet_id}}"
+     region: "{{ ec2_region }}"
+     network:
+        assign_public_ip: "{{ assign_public_ip| bool }}"
+     tags:
+        Name: "{{ec2_tag_Name}}"
+        environment: "{{ec2_tag_environment}}"
+        cluster: "{{ec2_tag_cluster}}"
+        os: "{{ec2_tag_os}}"
+        os_user: "{{ec2_tag_os_user}}"
+        ssh_port: "{{ec2_tag_ssh_port}}"
+        service: "{{ec2_tag_service}}"
+        team: "{{ec2_tag_team}}"
+        app_version: "{{ec2_tag_app_version}}"
+     wait: true
+     wait_timeout: 600
+     count: "{{ ec2_count }}"
+     volumes:
+     - device_name: /dev/sda1
+       ebs:
+          volume_type: gp3
+          volume_size: "{{ ec2_volume_size if ami_id is undefined else omit }}"
+          delete_on_termination: true
+   register: ec2_instance_info
+   when: private_ip_address is not defined
+
+ - name: Get information about the EC2 instance
+   ec2_instance_info:
+        region: "{{ region }}"
+        filters:
+          private-ip-address:
+            - "{{ private_ip_address }}"
+   register: start_instance_info
+   when: private_ip_address is defined
+
+ - name: Start the instance if it is stopped
+   ec2_instance:
+        instance_ids: "{{ start_instance_info.instances[0].instance_id }}"
+        region: "{{ region }}"
+        state: running
+        wait: yes
+   when: private_ip_address is defined
+
+ - name: Add all instance Private IPs to host group
+   add_host:
+    hostname: "{{ item.private_ip_address }}"
+    ansible_ssh_private_key_file: "~/.ssh/newigpkeys/{{ ec2_key_name }}.pem"
+    ansible_user: "{{ ec2_tag_os_user }}"
+    groupname: launched-instances
+   loop: "{{ ec2_instance_info.instances if private_ip_address is not defined else start_instance_info.instances }}"
+
+ - name: Pause for 1 minutes for instances to get healthy
+   ansible.builtin.pause:
+    minutes: 1

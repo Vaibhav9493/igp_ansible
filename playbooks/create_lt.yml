@@ -1,0 +1,11 @@
+# Generic Playbook for creating Launch template.
+# Notes:
+#   - create_lt --> Role for creating the Launch Template for EC2 Autoscaling.
+# Example invocation:
+#   ansible-playbook -vvv /etc/ansible/playbooks/create_lt.yml -e deployment_stack="$deployment_stack" -e start_job_build_number="$start_job_build_number" -e lt_name="$lt_name" -e lt_version="$lt_version" -e ami_id="$ami_id" -e ec2_key_pair="$ec2_key_pair" -e ec2_instance_profile="$ec2_instance_profile" -e ec2_sg_id="$ec2_sg_id" -e ec2_tag_Name="$ec2_tag_Name" -e ec2_tag_environment="$ec2_tag_environment" -e ec2_tag_cluster="$ec2_tag_cluster" -e ec2_tag_os="$ec2_tag_os" -e ec2_tag_os_user="$ec2_tag_os_user" -e ec2_tag_service="$ec2_tag_service" -e ec2_tag_ssh_port="$ec2_tag_ssh_port" -e ec2_tag_team="$ec2_tag_team" -e ec2_tag_app_version="$ec2_tag_app_version" -e elastic_fleet_enrolment_token="$elastic_fleet_enrolment_token" -e elastic_fleet_url="$elastic_fleet_url" -e elastic_fleet_tag="$elastic_fleet_tag"
+
+- hosts: "localhost"
+  roles:
+    - { role: "create_lt" }
+
+

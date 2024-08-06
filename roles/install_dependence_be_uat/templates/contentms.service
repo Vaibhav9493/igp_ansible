@@ -1,0 +1,13 @@
+Description=Start Panel Java Service
+
+
+[Service]
+WorkingDirectory=/opt/jars
+ExecStart=java -DserverProperty=/opt/properties/application.properties -javaagent:/opt/jars/elastic-apm-agent.jar -Delastic.apm.service_name=content-p -Delastic.apm.server_url=https://elastic-apm.joinventures.com:8200 -Delastic.apm.environment=production -Delastic.apm.application_packages=com.igp -jar distribution.jar
+User=root
+Type=simple
+Restart=on-failure
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target

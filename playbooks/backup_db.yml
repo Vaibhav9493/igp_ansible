@@ -1,0 +1,30 @@
+# Playbook for taking Db-backup and uploading to s3 bucket
+# Notes:
+#   - db_backup --> Role for taking backup
+#   - upload_to_s3 --> Role to upload the files to s3 bucket
+
+# Example invocation:
+# ansible-playbook -vvv /etc/ansible/playbooks/backup_db.yml -e db_endpoint="$db_endpoint" -e db_user="$db_user" -e db_password="$db_password" -e backup_type="$backup_type" -e db_names="$db_names" -e table_names="$table_names"  -e backup_path="$backup_path" -e s3_bucket_name="$s3_bucket_name" -e s3_bucket_object_path="$s3_bucket_object_path" 
+
+---
+- hosts: localhost
+  vars:
+    role_list: ['db_backup', 'upload_to_s3']
+    db_list: "{{ db_names.split(',') if (backup_type != 'all_dbs') else [] }}"
+    table_list: "{{ table_names.split(',') if (backup_type == 'specific_tables' and table_names != 'all') else [] }}"
+
+  tasks:
+    - name: set date variable 
+      set_fact:
+        Year: "{{ lookup('pipe', 'TZ=\"Asia/Kolkata\" date +%Y') }}"
+        Month: "{{ lookup('pipe', 'TZ=\"Asia/Kolkata\" date +%m') }}"
+        Day: "{{ lookup('pipe', 'TZ=\"Asia/Kolkata\" date +%d') }}"
+        Hour: "{{ lookup('pipe', 'TZ=\"Asia/Kolkata\" date +%H') }}"
+        Minute: "{{ lookup('pipe', 'TZ=\"Asia/Kolkata\" date +%M') }}"
+       
+    - name: Include roles in a nested loop
+      include_role:
+        name: "{{ item[1] }}"
+      vars:
+        db_resource_name: "{{ item[0] }}"
+      loop: "{{ (table_list if table_list|length > 0 else  db_list if db_list|length > 0  else ['all']) | product(role_list) | list }}"

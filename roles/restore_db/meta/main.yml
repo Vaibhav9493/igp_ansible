@@ -1,0 +1,8 @@
+---
+galaxy_info:
+  author: Manasi Naik/Nayan Turankar
+  description: Role for restore database
+  company: IGP
+  license: GPL
+  min_ansible_version: 2.0
+dependencies: []

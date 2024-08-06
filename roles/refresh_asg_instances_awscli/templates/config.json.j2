@@ -1,0 +1,12 @@
+{% raw %}
+{
+    "AutoScalingGroupName": "{% endraw %}{{ asg_name }}{% raw %}",
+    "Preferences": {
+        "InstanceWarmup": {% endraw %}{{ instance_warmup }}{% raw %},
+        "MinHealthyPercentage": {% endraw %}{{ min_healthy_percentage }}{% raw %},
+        "ScaleInProtectedInstances": "{% endraw %}{{ scale_in_protected_instances }}{% raw %}",
+        "StandbyInstances": "{% endraw %}{{ standby_instances }}{% raw %}",
+        "SkipMatching": {% endraw %}{{ skip_matching }}{% raw %}
+    }
+}
+{% endraw %}

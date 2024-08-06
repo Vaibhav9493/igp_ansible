@@ -1,0 +1,3 @@
+---
+- name: include restart task
+  include: "{{dep_package}}.yml"

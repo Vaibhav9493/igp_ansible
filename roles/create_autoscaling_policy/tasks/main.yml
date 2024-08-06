@@ -1,0 +1,15 @@
+---
+- name: Create TargetTracking predefined policy
+  local_action:
+      module: ec2_scaling_policy
+      name: "{{ asp_name }}"
+      policy_type: TargetTrackingScaling
+      target_tracking_config:
+         predefined_metric_spec:
+            predefined_metric_type: "{{asp_predefined_metric_type}}"
+         target_value: "{{ asp_target_value }}"
+         disable_scalein: "{{ asp_disable_scalein }}"
+      asg_name: "{{ asg_name }}"
+      cooldown: "{{asp_cooldown}}"
+      region: "{{ asp_region }}"
+  register: "asp_details"

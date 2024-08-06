@@ -1,0 +1,6 @@
+asp_name: "test_asp_001"
+asp_target_value: "70"
+asp_region: "us-east-1"
+asp_disable_scalein: "false"
+asp_predefined_metric_type: "ASGAverageCPUUtilization"
+asp_cooldown: "300"

@@ -1,0 +1,4 @@
+min_healthy_percentage: 90
+instance_warmup: 120
+asg_name: test-asg
+region: us-east-1

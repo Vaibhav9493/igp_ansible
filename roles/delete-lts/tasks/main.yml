@@ -1,0 +1,25 @@
+---
+- name: List LTs except the top {{ count }}
+  shell: "aws ec2 describe-launch-templates --filters Name=launch-template-name,Values={{ ltname }} --query 'LaunchTemplates[*].[LaunchTemplateName,CreateTime]' --region {{region}} --output text | sort -k2 -r |tail -n +{{ count | int + 1 }}"
+  register: delete_launch_templates
+
+- name: Print LTs except the top {{ count }}
+  debug:
+   var: delete_launch_templates.stdout_lines
+
+- name: Copy LTs except the top {{ count }} in file to get the name
+  copy:
+   content: "{{ delete_launch_templates.stdout_lines }}"
+   dest: /tmp/list-lts
+
+- name: Copy the lt names to a file
+  shell: |
+   cat /tmp/list-lts | tr -d '[]\" ' | tr ',' '\n' | sed 's/\\/\ /g' >> /tmp/sorted-lts
+   awk '{print $1}' /tmp/sorted-lts >> /tmp/ltstodelete
+
+- name: Delete LTs except the top {{ count }}
+  shell: |
+   for i in $(cat /tmp/ltstodelete); do aws ec2 delete-launch-template --launch-template-name $i --region "{{region}}" ; done
+
+- name: Delete files
+  shell: rm -rf /tmp/list-lts /tmp/sorted-lts /tmp/ltstodelete

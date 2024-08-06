@@ -1,0 +1,15 @@
+---
+galaxy_info:
+  author: Harsimran Singh
+  description: Role for IGP Deployment.
+  company: IGP
+  license: GPL
+  platforms:
+  - name: Amazon
+    versions:
+    - 6
+  - name: EL
+    versions:
+    - 6
+    - 7
+dependencies: []

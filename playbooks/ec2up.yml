@@ -1,0 +1,11 @@
+# Generic Playbook for creating the EC2 instances.
+# Notes:
+#   - ec2up --> Role for creating the EC2 instances.
+# Example invocation:
+#   ansible-playbook -vvv /etc/ansible/playbooks/ec2up.yml -e ec2_key_name: "serveradmin" -e ec2_sg_id: "sg-2fa5af5d" -e ec2_instance_type: "t4g.medium" -e termination_protechtion: "no" -e ec2_instance_profile: "igp-ec2-profile-prod" -e ec2_ami_id: "ami-04ace70e7f6a09d4a" -e ec2_subnet_id: "subnet-0acc71da8e7560bdc" -e ec2_region: "us-east-1" -e assign_public_ip: "no" -e ec2_tag_Name: "anonymous-test-instance" -e ec2_tag_environment: "test" -e ec2_tag_cluster: "anonymous-test-instance" -e ec2_tag_os: "rocky-linux-9" -e ec2_tag_os_user: "rocky" -e ec2_tag_ssh_port: "22" -e ec2_tag_service: "anonymous" -e ec2_tag_team: "devops" -e ec2_tag_app_version: "no-version" -e ec2_count: "1" -e ec2_volume_size: "30"
+
+---
+- hosts: localhost
+  roles:
+    - { role: "ec2up" }
+    

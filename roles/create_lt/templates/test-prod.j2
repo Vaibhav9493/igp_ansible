@@ -1,0 +1,7 @@
+#!/bin/bash
+
+# Enroll Elastic Agent to Fleet server
+echo y | elastic-agent enroll --url="{{ elastic_fleet_url }}" --enrollment-token="{{ elastic_fleet_enrolment_token }}"  --tag="{{ elastic_fleet_tags }}"
+
+# Restart Elastic Agent
+systemctl restart elastic-agent

@@ -1,0 +1,15 @@
+# Generic Playbook to notify if any latest asg is not active.
+# Notes:
+#   - findasg_and_notifytogchat  --> Role to call find_asg and notify_to_gchat roles.
+# Example invocation:
+#   ansible-playbook -vvv /etc/ansible/playbooks/notify_latest_asg_not_active.yml -e services="$services" -e region="$region" -e google_chat_webhook="$google_chat_webhook"
+
+---
+- hosts: localhost
+  tasks: 
+    - name: Task to call findasg_and_notifytogchat role for each service
+      include_role:
+        name: findasg_and_notifytogchat
+      vars:
+        service: "{{ item }}"
+      loop: "{{ services.split(',') }}"

@@ -1,0 +1,13 @@
+# Playbook for elastic-apm deployment with autoscaling group using ALB.
+# Notes:
+#   - create_lt --> Role for creating the Launch Template for EC2 Autoscaling.
+#   - create_lt_asg --> Role for creating the Autoscaling Group.
+#   - create_autoscaling_policy --> Role for creating the Autoscaling policy.
+# Example invocation:
+#   ansible-playbook -vvv /etc/ansible/playbooks/deployment_for_elastic_apm.yml  -e deployment_stack="$deployment_stack_name" -e start_job_build_number="$start_job_build_number" -e ec2_tag_Name="$ec2_tag_Name" -e ec2_tag_environment="$ec2_tag_environment" -e ec2_tag_cluster="$ec2_tag_cluster" -e ec2_tag_service="$ec2_tag_service" -e ec2_tag_team="$ec2_tag_team" -e ec2_tag_app_version="$ec2_tag_app_version" -e ec2_key_pair="$ec2_key_pair" -e ec2_instance_profile="$ec2_instance_profile" -e ec2_sg_id="$ec2_sg_id" -e ec2_tag_os="$ec2_tag_os" -e ec2_tag_os_user="$ec2_tag_os_user" -e ec2_tag_ssh_port="$ec2_tag_ssh_port" -e lt_name="$lt_name" -e lt_version="$lt_version" -e asg_name="$asg_name" -e asg_base_size="$asg_base_size" -e asg_above_base_percent="$asg_above_base_percent" -e asg_min_size="$asg_min_size" -e asg_max_size="$asg_max_size" -e asg_desired_size="$asg_desired_size" -e asg_health_check_type="$asg_health_check_type" -e asg_health_check_period="$asg_health_check_period" -e asg_vpc_subnets="$asg_vpc_subnets" -e asg_region="$asg_region" -e asg_capacity_rebalance="$asg_capacity_rebalance" -e instance_type_list="$instance_type_list" -e on_demand_allocation_strategy="$on_demand_allocation_strategy" -e spot_allocation_strategy="$spot_allocation_strategy" -e lb_type="$lb_type" -e lb_entity="$lb_entity" -e asp_enable="$asp_enable" -e asp_cooldown="$asp_cooldown" -e asp_predefined_metric_type="$asp_predefined_metric_type" -e asp_name="$asp_name" -e asp_target_value="$asp_target_value" -e elastic_fleet_enrolment_token="$elastic_fleet_enrolment_token" -e elastic_fleet_url="$elastic_fleet_url" -e elastic_fleet_tags="$elastic_fleet_tags" -e image_id="$image_id" -e deployment_arch="$deployment_arch"
+
+- hosts: "localhost"
+  roles:
+    - { role: "create_lt", ami_id: "{{ image_id }}" }
+    - { role: "create_lt_asg" }
+    - { role: "create_autoscaling_policy", when: asp_enable == "true" }

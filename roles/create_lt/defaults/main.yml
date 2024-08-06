@@ -1,0 +1,7 @@
+lt_name: "igptest_lt"
+lt_version: "1"
+ami_id: "ami-351ad948"
+ec2_key_pair: "igp-prod-admin"
+ec2_sg_id: "sg-504bf027"
+lt_ec2_instance_type: "t2.medium"
+ec2_instance_profile: "ec2-prod-admin-instance-profile"

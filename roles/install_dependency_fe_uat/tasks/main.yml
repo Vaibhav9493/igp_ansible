@@ -1,0 +1,119 @@
+---
+    - name: Update packages
+      become: yes
+      dnf:
+        name: '*'
+        state: latest
+
+    - name: Install epel-release, wget, curl, vim, sysstat, net-tools, telnet, make, gcc, python-pip,git
+      become: yes 
+      dnf:
+        name: "{{ item }}"
+        state: present
+      loop:
+        - epel-release
+        - wget
+        - curl
+        - vim
+        - sysstat
+        - net-tools
+        - telnet
+        - make
+        - gcc
+        - python-pip
+        - git
+    
+    - name: Install NVM
+      become: yes
+      shell: |
+        curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.1/install.sh | bash
+      args:
+        executable: /bin/bash
+
+    - name: Add NVM to PATH
+      lineinfile:
+        path: ~/.bashrc
+        line: 'export NVM_DIR="$HOME/.nvm"'
+        insertafter: EOF
+
+    - name: Source NVM in bashrc
+      lineinfile:
+        path: ~/.bashrc
+        line: '[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"'
+        insertafter: EOF
+
+    - name: Install specific Node.js version using NVM
+      become: yes
+      shell: |
+        source ~/.nvm/nvm.sh
+        nvm install 14.18.2
+      args:
+        executable: /bin/bash
+
+    - name: Install 'forever' globally using npm
+      become: yes
+      shell: |
+        source ~/.nvm/nvm.sh
+        nvm use 14.18.2
+        npm install -g forever
+      args:
+        executable: /bin/bash
+
+    - name: Install s3cmd 
+      become: yes
+      dnf:
+        name: s3cmd
+
+    - name: clone repo and checkout to a branch
+      git:
+        repo: 'https://{{ git_username }}:{{ git_password }}@github.com/igphub/fe.git'
+        dest: '/opt/fe'
+        version: 'master'
+
+    - name: Pull latest JSON files from S3
+      shell: s3cmd get --recursive --progress --force s3://deploymentstack-files/frontend/json_files/json/ /tmp/
+
+    - name: Copy sitemap files.
+      shell: |
+        mkdir /etc/json
+        cp -rf /tmp/* /etc/json/
+        cp  -rf /etc/json/sitemap/* /opt/fe/public/
+        /root/.nvm/versions/node/v14.18.2/bin/node /root/.nvm/versions/node/v14.18.2/bin/npm rebuild node-sass
+
+    - name: Pull environment file from s3
+      shell: s3cmd get --recursive --progress --force s3://deploymentstack-files/frontend/fe_environments/env-{{ deployment_stack[-1] }}/  /opt/fe/
+
+    - name: download node_modules from S3
+      shell: s3cmd get --recursive --progress --force s3://deploymentstack-files/frontend/node_modules /opt/fe/
+
+    - name: crete script folder and copy file
+      shell: mkdir /root/scripts
+
+    - name: Copy files to the script directory
+      become: yes
+      template:
+        src: "/etc/ansible/roles/install_dependency_fe_uat/templates/restart.sh.j2"
+        dest: "/root/scripts/restart.sh"
+        mode: 700
+
+    - name: Copy file pull-and-build.sh to the script directory
+      become: yes
+      template:
+        src: "/etc/ansible/roles/install_dependency_fe_uat/templates/pull-and-build.sh.j2"
+        dest: "/root/scripts/pull-and-build.sh"
+        mode: 700
+
+    - name: run the script of restart.sh
+      shell: |
+        export PATH=/root/.nvm/versions/node/v14.18.2/bin:$PATH
+        sh /root/scripts/restart.sh
+
+    - name: Pull build file from s3 and save in /opt/fe
+      shell: s3cmd get --recursive --progress --force s3://deploymentstack-files/frontend/build_files/{{ deployment_stack | regex_replace('(-u|-t).*', '') }}/{{ deployment_stack }}/  /opt/fe/
+
+    - name: create passets folder.
+      shell: |
+        mkdir /opt/fe/public/passets
+
+    - name: Pull latest Passets folder from S3
+      shell: s3cmd get --recursive --progress --force s3://deploymentstack-files/frontend/passets_folder/{{ deployment_stack | regex_replace('(-u|-t).*', '') }}/{{ deployment_stack }}/passets/ /opt/fe/public/passets/

@@ -1,0 +1,8 @@
+---
+
+- debug:
+    msg: "restarting {{dep_package}}"
+  notify:
+    - "delete_pm2_service"
+    - "start_pm2_service"
+    - "restart_nginx"

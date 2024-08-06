@@ -1,0 +1,2 @@
+---
+restart_command: "sleep 2 ; sudo service panelapi restart ; sleep 2"

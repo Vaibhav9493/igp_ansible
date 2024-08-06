@@ -1,0 +1,9 @@
+# Generic Playbook for stopping or terminating the EC2 instances.
+# Notes:
+#   - ec2down --> Role for stopping or terminating the EC2 instances.
+# Example invocation:
+#   ansible-playbook -vvv /etc/ansible/playbooks/ec2down.yml -e terminate_instance="yes | no" -e ec2_instance_ids="$ec2_instance_ids"
+---
+- hosts: localhost
+  roles:
+    - { role: "ec2down" }

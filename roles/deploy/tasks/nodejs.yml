@@ -1,0 +1,9 @@
+---
+
+- name: install package deployment update for igp-coordinator service
+  yum: name={{ item }} state=latest update_cache=yes
+  with_items: "{{dep_package}}"
+  notify:
+    - "delete_pm2_service"
+    - "start_pm2_service"
+    - "restart_nginx"

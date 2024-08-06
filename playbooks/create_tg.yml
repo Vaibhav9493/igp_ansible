@@ -1,0 +1,10 @@
+# Generic Playbook for creating Target Group
+# Notes:
+#   - create_tg --> Role for creating the Target Group.
+# Example invocation:
+#   ansible-playbook -vvv /etc/ansible/playbooks/create_tg.yml -e tg_name="$tg_name" -e tg_protocol="$tg_protocol" -e tg_port="$tg_port" -e tg_vpc_id="$tg_vpc_id" -e tg_healthcheck_protocol="$tg_healthcheck_protocol" -e tg_healthcheck_port="$tg_healthcheck_port" -e tg_healthcheck_path="$tg_healthcheck_path" -e tg_healthcheck_success_response_code="$tg_healthcheck_success_response_code" -e tg_healthcheck_interval="$tg_healthcheck_interval" -e tg_healthcheck_timeout="$tg_healthcheck_timeout" -e tg_healthcheck_healthy_count="$tg_healthcheck_healthy_count" -e tg_healthcheck_unhealthy_count="$tg_healthcheck_unhealthy_count" -e tg_deregistration_delay_timeout="$tg_deregistration_delay_timeout" -e ec2_tag_Name="$ec2_tag_Name" -e ec2_tag_environment="$ec2_tag_environment" -e ec2_tag_cluster="$ec2_tag_cluster" -e ec2_tag_service="$ec2_tag_service" -e ec2_tag_team="$ec2_tag_team" -e ec2_tag_app_version="$ec2_tag_app_version"
+
+- hosts: "localhost"
+  roles:
+    - { role: "create_tg" }
+

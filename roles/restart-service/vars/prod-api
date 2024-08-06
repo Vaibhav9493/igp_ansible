@@ -1,0 +1,2 @@
+---
+restart_command: "sleep 10 ; sudo service api restart ; sleep 10"

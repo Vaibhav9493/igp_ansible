@@ -1,0 +1,3 @@
+filters:
+  "tag:name": "test-ami"
+region: "us-east-1"

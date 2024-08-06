@@ -1,0 +1,19 @@
+---
+galaxy_info:
+  author:
+    - Manasi Naik
+    - Nayan Turankar
+  description: Role for registering instance from ELB for IGP.
+  company: IGP
+  license: GPL
+  platforms:
+    - name: Rocky Linux
+      versions:
+        - 8
+        - 9
+    - name: EL
+      versions:
+        - 7
+        - 8
+        - 9
+dependencies: []

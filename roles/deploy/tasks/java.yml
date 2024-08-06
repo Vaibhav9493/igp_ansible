@@ -1,0 +1,28 @@
+---
+
+- name: stop tomcat server
+  service: name=tomcat state=stopped
+
+- name: clean working directory
+  shell: "rm -rf {{tomcat_server_directory}}/work/*"
+
+- name: clean webapps directory
+  shell: "rm -rf {{install_directory}}/*"
+
+- name: install package deployment update for contest service
+  yum: name={{ item }} state=latest update_cache=yes
+  with_items: "{{dep_package}}"
+
+- name: set environment file.
+  shell: "cp {{install_directory}}/{{setenv_file}} {{tomcat_server_directory}}/bin/setenv.sh;"
+
+- name: set newrelic file.
+  become: yes
+  shell: "mkdir -p {{tomcat_server_directory}}/newrelic;cp -rf {{install_directory}}/newrelic.* {{tomcat_server_directory}}/newrelic/;"
+
+- name: set tomcat permissions.
+  become: yes
+  shell: "chown -R tomcat.tomcat {{tomcat_server_directory}}"
+
+- name: start tomcat server
+  service: name=tomcat state=started

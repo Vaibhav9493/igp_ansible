@@ -1,0 +1,8 @@
+---
+elastic_agent_version: 8.10.4
+processor_type: graviton
+graviton_architecture: "linux-arm64"
+intel_architecture: "linux-x86_64"
+elastic_fleet_url: "https://efleetserv.joinventures.com:8220"
+elastic_fleet_enrolment_token: "cVFXdDlJa0J0ZU9XRi13bWZlbkQ6MTFMS1FlSVNTenFyNkFkb0tMZXlvdw=="
+instance_tag_name: test-instance

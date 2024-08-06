@@ -1,0 +1,8 @@
+---
+    - name: Delete AMIs and  its snapshots
+      amazon.aws.ec2_ami:
+        image_id: "{{ item }}"
+        state: absent
+        delete_snapshot: True
+        region: "{{region}}"
+      with_items: "{{ ami_ids }}"

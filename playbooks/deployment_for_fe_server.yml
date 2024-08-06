@@ -1,0 +1,24 @@
+# Playbook to create fresh uat server
+# Notes:
+#   - ec2up --> Role for creating the EC2 instances. 
+#   - upload_fe_configuration_file --> Role for upload build files
+# Example invocation:
+#   ansible-playbook -vvv /etc/ansible/playbooks/depolyment_on_fe_uat.yml -e deployment_stack="$deployment_stack" -e region="$region" -e private_ip_address="$private_ip_address" 
+---
+- name: launch instance
+  hosts: localhost
+  roles:
+    - { role: "ec2up" }
+
+- name: depolyment and build on fresh server 
+  hosts: launched-instances
+  become: yes
+  tasks:
+     - name: run the script of pull-and-build.sh
+       shell: |
+        export PATH=/root/.nvm/versions/node/v14.18.2/bin:$PATH
+        sh /root/scripts/pull-and-build.sh
+
+     - name: role to upload configuration file
+       include_role:
+         name: "upload_fe_configuration_files"

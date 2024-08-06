@@ -1,0 +1,20 @@
+---
+ - name: Stop EC2 Box
+   local_action:
+      module: amazon.aws.ec2
+      state: 'stopped'
+      region: us-east-1
+      instance_ids: "{{ ec2_instance_ids.split(',') }}"
+      termination_protection: no
+      wait: true
+   when: terminate_instance == "no"
+
+ - name: Terminate EC2 Box
+   local_action:
+      module: amazon.aws.ec2
+      state: 'absent'
+      region: us-east-1
+      instance_ids: "{{ ec2_instance_id.split(',') }}"
+      wait: true
+      termination_protection: no
+   when: terminate_instance == "yes"

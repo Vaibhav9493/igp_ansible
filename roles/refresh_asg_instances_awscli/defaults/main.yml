@@ -1,0 +1,8 @@
+asg_name: "test-asg"
+instance_warmup: 120
+min_healthy_percentage: 100
+scale_in_protected_instances: "Refresh"
+standby_instances: "Terminate"
+skip_matching: false
+asg_region: us-east-1
+

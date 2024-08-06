@@ -1,0 +1,22 @@
+{% raw %}
+{
+    "ListenerArn": "{% endraw %}{{ listener_arn }}{% raw %}",
+    "DefaultActions": [
+        {
+            "Type": "forward",
+            "ForwardConfig": {
+                "TargetGroups": [
+                    {
+                        "TargetGroupArn": "{% endraw %}{{ target_group_arn_100 }}{% raw %}",
+                        "Weight": 100
+                    },
+                    {
+                        "TargetGroupArn": "{% endraw %}{{ target_group_arn_0 }}{% raw %}",
+                        "Weight": 0
+                    }
+                ]
+            }
+        }
+    ]
+}
+{% endraw %}

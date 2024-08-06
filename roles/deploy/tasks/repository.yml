@@ -1,0 +1,32 @@
+---
+# task file for configure repository
+- name: Clean old repos
+  become: yes
+  shell: rm -rf /etc/yum.repos.d/igprepo*
+
+- name: clean yum cache
+  become: yes
+  shell: yum clean all
+
+- name: configure igprepo
+  become: yes
+  template:
+    src: igprepo.repo.j2
+    dest: /etc/yum.repos.d/igprepo-{{dep_env}}-{{dep_package}}.repo
+    owner: root
+    group: root
+    mode: 0644
+  when: dep_env != "prod" and dep_env != "uat"
+
+- name: configure igprepo for prod
+  become: yes
+  template:
+    src: igprepo-prod.repo.j2
+    dest: /etc/yum.repos.d/igprepo-{{dep_env}}-{{dep_package}}.repo
+    owner: root
+    group: root
+    mode: 0644
+  when: dep_env == "prod" or dep_env == "uat"
+
+- name: Clean yum cache
+  shell: yum clean all && rm -rf /var/cache/yum

@@ -1,0 +1,8 @@
+---
+galaxy_info:
+  author: Manasi Naik
+  description: Role to list the files of s3 bucket.
+  company: IGP
+  license: GPL
+  min_ansible_version: 2.0
+dependencies: []

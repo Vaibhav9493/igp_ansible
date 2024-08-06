@@ -1,0 +1,26 @@
+# Playbook to download the db_backup and then restore database
+# Notes:
+#   - download_s3file  -->  Role to download s3 file and extract it
+#   - restore_db --> Role to restore database
+# Example invocation:
+#   ansible-playbook -vvv /etc/ansible/playbooks/restore_db.yml -e bucket_name="$bucket_name" -e object="$object" -e dest_path="$dest_path" -e db_endpoint="$db_endpoint" -e db_user="$db_user" -e db_password="$db_password" -e db_name="$db_name"
+
+---
+- name: Download and restore the database backup
+  hosts: localhost
+  gather_facts: False
+  tasks: 
+    - name: Download S3 file
+      include_role:
+        name: "download_s3file"
+      vars:
+        dest: "{{dest_path}}/{{object | basename }}"
+
+    - name: Extract the downloaded s3 file
+      shell: gunzip -d "{{dest_path}}/{{object | basename }}"
+
+    - name: Restore the db-backup
+      include_role:
+        name: "restore_db"
+      vars:
+        restore_target: "{{dest_path}}/{{ (object | basename).split('.gz')[0] }}"

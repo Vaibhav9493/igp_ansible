@@ -1,0 +1,8 @@
+---
+galaxy_info:
+  author: Harsimran/Manasi/Nayan
+  description: Role for launching new ec2-instance or starting the stopped instance and then adding the ec2 instance to host group
+  company: IGP
+  license: GPL
+  min_ansible_version: 2.0
+dependencies: []

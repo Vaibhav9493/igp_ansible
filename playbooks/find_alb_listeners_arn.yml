@@ -1,0 +1,14 @@
+# Generic Playbook for finding listener arn from alb
+# Notes:
+#   - find_alb_info --> Role for finding alb information.
+# Example invocation:
+#   ansible-playbook -vvv /etc/ansible/playbooks/find_alb_listeners.yml -e alb_name="$alb_name" -e alb_region="$alb_region"
+
+- hosts: "localhost"
+  roles:
+    - { role: "find_active_tg_alb" }
+  tasks:
+    - name: fetching listener arn from alb for HTTPS
+      local_action:
+        module: debug
+        msg: "{% for r in albinfo.load_balancers %}{% for la in r. listeners %}{% if la.protocol == 'HTTPS' %}{{ la.listener_arn.split(' ') | join(',') }}{% endif %}{% endfor %}{% endfor %}"

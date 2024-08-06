@@ -1,0 +1,10 @@
+vol_size: 100
+vol_type: "gp3"
+vol_region: "us-east-1"
+vol_tag_name: test-instance
+vol_device_name: "/dev/sdb"
+vol_os_name: "/dev/nvme1n1"
+partition_num: 1
+fs_type: "xfs"
+mount_path: "/data"
+mount_src: "/dev/nvme1n1p1"

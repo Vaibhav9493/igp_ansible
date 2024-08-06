@@ -1,0 +1,23 @@
+# Generic Playbook for deployment with autoscaling group using ALB.
+# Notes:
+#   - create_tg --> Role for creating the Target Group for EC2 Autoscaling.
+#   - create_lt --> Role for creating the Launch Template for EC2 Autoscaling.
+#   - create_lt_asg --> Role for creating the Autoscaling Group.
+#   - create_autoscaling_policy --> Role for creating the Autoscaling policy.
+#   - post_request --> Role to post a request.
+# Example invocation:
+#   ansible-playbook -vvv /etc/ansible/playbooks/immute_deploy_mixed_alb_wo_tg.yml -e deployment_stack="$deployment_stack" -e start_job_build_number="$start_job_build_number" -e ec2_tag_Name="$ec2_tag_Name" -e ec2_tag_environment="$ec2_tag_environment" -e ec2_tag_cluster="$ec2_tag_cluster" -e ec2_tag_service="$ec2_tag_service" -e ec2_tag_team="$ec2_tag_team" -e ec2_tag_app_version="$ec2_tag_app_version" -e ec2_key_pair="$ec2_key_pair" -e ec2_instance_profile="$ec2_instance_profile" -e ec2_sg_id="$ec2_sg_id" -e ec2_tag_os="$ec2_tag_os" -e ec2_tag_os_user="$ec2_tag_os_user" -e ec2_tag_ssh_port="$ec2_tag_ssh_port" -e lt_name="$lt_name" -e lt_version="$lt_version" -e asg_name="$asg_name" -e asg_base_size="$asg_base_size" -e asg_above_base_percent="$asg_above_base_percent" -e asg_min_size="$asg_min_size" -e asg_max_size="$asg_max_size" -e asg_desired_size="$asg_desired_size" -e asg_health_check_type="$asg_health_check_type" -e asg_health_check_period="$asg_health_check_period" -e asg_vpc_subnets="$asg_vpc_subnets" -e asg_region="$asg_region" -e asg_capacity_rebalance="$asg_capacity_rebalance" -e instance_type_list="$instance_type_list" -e on_demand_allocation_strategy="$on_demand_allocation_strategy" -e spot_allocation_strategy="$spot_allocation_strategy" -e lb_type="$lb_type" -e lb_entity="$lb_entity" -e asp_enable="$asp_enable" -e asp_cooldown="$asp_cooldown" -e asp_predefined_metric_type="$asp_predefined_metric_type" -e asp_name="$asp_name" -e asp_target_value="$asp_target_value" -e elastic_fleet_enrolment_token="$elastic_fleet_enrolment_token" -e elastic_fleet_url="$elastic_fleet_url" -e elastic_fleet_tags="$elastic_fleet_tags" -e ami_instance_id="$ami_instance_id" -e ami_name="$ami_name" -e ami_tag_environment="$ami_tag_environment" -e ami_region="$ami_region" -e ami_tag_service_name="$ami_tag_service_name" -e ami_tag_team="$ami_tag_team" -e ami_tag_app_version="$ami_tag_app_version" -e ami_tag_dont_delete="$ami_tag_dont_delete" -e deployment_arch="$deployment_arch" -e elastic_agent_version="$elastic_agent_version" -e build_timestamp="$build_timestamp" -e apm_app_version="$apm_app_version" -e apm_environment="$apm_environment"
+
+- hosts: "localhost"
+  vars:
+    formated_timestamp: "{{ build_timestamp[:4] + '-' + build_timestamp[4:6] + '-' + build_timestamp[6:8] + 'T' + build_timestamp[8:10] + ':' + build_timestamp[10:12] + ':' + build_timestamp[12:14] + '.000Z' }}"
+    url: "https://kibana.joinventures.com/api/apm/services/{{deployment_stack}}/annotation"
+    headers: '{"Content-Type": "application/json", "kbn-xsrf": "true", "Authorization": "ApiKey YlBnTjBvNEJDYVhKSWxDeFoyZkE6WnlBd3QtdDlRNWk3Z0JhSkRDal84dw=="}'
+    body_format: json
+    body: '{"@timestamp": "{{formated_timestamp}}", "service": {"version": "{{apm_app_version}}", "environment": "{{apm_environment}}"}}'
+  roles:
+    - { role: "create_ami" }
+    - { role: "create_lt", ami_id: "{{ create_ami_info.image_id }}" }
+    - { role: "create_lt_asg" }
+    - { role: "create_autoscaling_policy", when: asp_enable == "true" }
+    - { role: "post_request" }

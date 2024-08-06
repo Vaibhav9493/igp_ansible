@@ -1,0 +1,29 @@
+# Playbook for listing the db-backup files of s3 bucket.
+# Notes:
+#   - list_s3_files --> Role for listing s3 bucket files.
+# Example invocation:
+# ansible-playbook -vvv /etc/ansible/playbooks/list_db_backup_files.yml -e s3_bucket="$s3_bucket" -e backup_type="$backup_type" -e db_name="$db_name" -e table_name="$table_name" -e year="$year" -e month="$month" -e date="$date" -e hour="$hour"
+
+---
+- name: List db-backup files of s3 bucket
+  hosts: localhost
+  gather_facts: False
+  roles:
+    - role: "list_s3_files"
+      prefix: >-
+            {% if backup_type == 'specific_dbs' -%}
+              Aurora/{{backup_type}}/{{year}}/{{month}}/{{date}}
+              {%- if hour is defined and hour != '' -%}
+                /{{hour}}/{{db_name}}
+              {%- endif %}
+            {%- elif backup_type == 'specific_tables'  -%}
+              Aurora/{{backup_type}}/{{db_name}}/{{year}}/{{month}}/{{date}}
+              {%- if hour is defined and hour != '' -%}
+                /{{hour}}/{{table_name}}
+              {%- endif %}
+            {%- elif backup_type == 'all_dbs'  -%}
+              Aurora/{{backup_type}}/{{year}}/{{month}}/{{date}}
+              {%- if hour is defined and hour != '' -%}
+                /{{hour}}/all
+              {%- endif %}
+            {%- endif %}

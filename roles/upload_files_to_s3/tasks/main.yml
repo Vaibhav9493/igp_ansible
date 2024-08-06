@@ -1,0 +1,10 @@
+---
+    - name: Upload files to S3 bucket
+      aws_s3:
+        bucket: "{{ s3_bucket }}"
+        object: "{{ object_path }}/{{file_item | basename }}"
+        src: "{{file_item}}"
+        mode: put
+      loop: "{{source_files.split(',')}}"
+      loop_control:
+        loop_var: file_item

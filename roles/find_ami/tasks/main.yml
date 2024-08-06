@@ -1,0 +1,12 @@
+---
+- name: Get AMIs 
+  amazon.aws.ec2_ami_info:
+    region: "{{region}}" 
+    filters: "{{ filters }}"
+  register: ami_list
+
+- name:  print out ami instance id
+  vars:
+    server01_ami: "{{ ami_list.images | selectattr('name', 'defined') | sort(attribute='creation_date') | last }}"
+  debug:
+    msg: "{{server01_ami.image_id}}"

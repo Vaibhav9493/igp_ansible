@@ -1,0 +1,8 @@
+---
+galaxy_info:
+  author: Nayan Turankar
+  description: Role for upload files
+  company: IGP
+  license: GPL
+  min_ansible_version: 2.0
+dependencies: []

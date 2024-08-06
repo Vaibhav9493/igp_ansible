@@ -1,0 +1,30 @@
+# Generic Playbook for Rolling restart of api instnaces
+# Notes:
+#   - instnace_de_register --> Role for de-registering instances from elb.
+#   - instance_register --> Role for registering instances to elb.
+# Example invocation:
+#   ansible-playbook -vvv restartplaybook.yml -f 5 -e cluster_name=tag_Name_prod_api_* -e servicename=apipanel -e num_deploy_host=1 -e ec2_elbs_out=prod-api-panel-int-elb  -e ec2_elbs_in=prod-api-panel-int-elb
+
+- hosts: "{{ cluster_name }}"
+  remote_user: "ubuntu"
+  vars:
+    ansible_ssh_port: "22"
+    ansible_ssh_private_key_file: "~/.ssh/newigpkeys/{{ key_name }}.pem"
+  serial: "{{ num_deploy_host }}"
+  roles:
+   - { role: "instance_de_register" }
+   - { role: "restart-service" }
+   - { role: "instance_register" }
+
+   
+  # tasks:
+  #  - name: include Instance-De-register role
+  #    include_role:
+  #     name: instance_de_register
+
+  #  - name: restart api service
+  #    shell: "{{ restart_command }}"
+
+  #  - name: include Instance-Register role
+  #    include_role:
+  #     name: instance_register

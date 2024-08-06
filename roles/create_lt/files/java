@@ -1,0 +1,21 @@
+{% raw %}
+#!/bin/bash
+rm -rvf /etc/yum.repos.d/igprepo.repo;
+
+cat > /etc/yum.repos.d/igprepo-prod.repo << EOF
+[igprepo-prod]
+name=igprepo
+baseurl=http://igprepo-prod.igp.local/igprepo/{% endraw %}{{dep_env}}{% raw %}/{% endraw %}{{dep_package}}{% raw %}
+enabled=1
+gpgcheck=0
+EOF
+
+sudo setenforce 0;
+sudo yum clean all;
+sudo yum install nscd -y;
+sudo yum install {% endraw %}{{dep_package}}{% raw %} -y;
+cd {% endraw %}{{install_directory}}{% raw %};
+sudo service apache-tomcat restart;
+sudo nscd restart;
+sudo nginx restart;
+{% endraw %}

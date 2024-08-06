@@ -1,0 +1,32 @@
+#!/bin/bash
+
+deployment_arch="{{ deployment_arch }}"
+
+#Restart API service
+systemctl restart api.service
+
+# Enroll Elastic Agent to Fleet server
+cd /tmp
+
+if [[ "$deployment_arch" == "intel" ]]
+then
+
+curl -L -O https://artifacts.elastic.co/downloads/beats/elastic-agent/elastic-agent-{{elastic_agent_version}}-linux-x86_64.tar.gz
+tar xzvf elastic-agent-{{elastic_agent_version}}-linux-x86_64.tar.gz
+cd elastic-agent-{{elastic_agent_version}}-linux-x86_64
+echo y | ./elastic-agent install --url="{{ elastic_fleet_url }}" --enrollment-token="{{ elastic_fleet_enrolment_token }}"  --tag="{{ elastic_fleet_tags }}"
+#echo y | elastic-agent enroll --url="{{ elastic_fleet_url }}" --enrollment-token="{{ elastic_fleet_enrolment_token }}"  --tag="{{ elastic_fleet_tags }}"
+
+elif [[ "$deployment_arch" == "graviton" ]]
+then
+
+curl -L -O https://artifacts.elastic.co/downloads/beats/elastic-agent/elastic-agent-{{elastic_agent_version}}-linux-arm64.tar.gz
+tar xzvf elastic-agent-{{elastic_agent_version}}-linux-arm64.tar.gz
+cd elastic-agent-{{elastic_agent_version}}-linux-arm64
+echo y | ./elastic-agent install --url="{{ elastic_fleet_url }}" --enrollment-token="{{ elastic_fleet_enrolment_token }}"  --tag="{{ elastic_fleet_tags }}"
+#echo y | elastic-agent enroll --url="{{ elastic_fleet_url }}" --enrollment-token="{{ elastic_fleet_enrolment_token }}"  --tag="{{ elastic_fleet_tags }}"
+
+fi
+
+# Restart Elastic Agent
+systemctl restart elastic-agent

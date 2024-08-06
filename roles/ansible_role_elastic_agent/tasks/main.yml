@@ -1,0 +1,28 @@
+---
+- name: Download Elastic Agent
+  get_url:
+    url: "https://artifacts.elastic.co/downloads/beats/elastic-agent/elastic-agent-{{elastic_agent_version}}-{{vars[processor_type + '_architecture']}}.tar.gz"
+    dest: /tmp
+
+- name: Extract gzip
+  unarchive:
+    src: /tmp/elastic-agent-{{elastic_agent_version}}-{{vars[processor_type + '_architecture']}}.tar.gz
+    dest: /tmp
+    remote_src: yes
+
+- name: Run installer
+  become: yes
+  shell:
+    chdir: /tmp/elastic-agent-{{elastic_agent_version}}-{{vars[processor_type + '_architecture']}}
+    cmd: "echo y | ./elastic-agent install --url={{ elastic_fleet_url }} --enrollment-token={{elastic_fleet_enrolment_token}} --tag={{ instance_tag_name }}"
+    
+
+- name: Cleanup downloaded file
+  file:
+    path: /tmp/elastic-agent-{{elastic_agent_version}}-{{vars[processor_type + '_architecture']}}.tar.gz
+    state: absent
+
+- name: Cleanup extract directory
+  file:
+    path: /tmp/elastic-agent-{{elastic_agent_version}}-{{vars[processor_type + '_architecture']}}
+    state: absent

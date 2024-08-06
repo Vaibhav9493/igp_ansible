@@ -1,0 +1,34 @@
+---
+ - name: Create and attach volume to EC2 instance
+   local_action:
+      module: amazon.aws.ec2_vol
+      device_name: "{{ vol_device_name }}"
+      instance: "{{ item.instance_id }}"
+      volume_size: "{{ vol_size }}"
+      volume_type: "{{ vol_type }}"
+      region: "{{ vol_region }}"
+      state: present
+      tags:
+        Name: "{{ vol_tag_name }}-extra-vol-001"
+   loop: "{{ ec2_instance_info.instances }}"
+ 
+ - name: Create partition
+   become: yes
+   parted:
+        device: "{{ vol_os_name }}"
+        number: "{{ partition_num }}"
+        state: present
+        fs_type: "{{ fs_type }}"
+   delegate_to: "{{ item.private_ip_address }}"
+   with_items:
+        - "{{ ec2_instance_info.instances }}"
+
+ - name: Create xfs filesystem on /dev/nvme1n1p1
+   become: yes
+   ansible.builtin.filesystem:
+        fstype: "{{ fs_type }}"
+        dev: "{{ mount_src }}"
+   delegate_to: "{{ item.private_ip_address }}"
+   with_items:
+        - "{{ ec2_instance_info.instances }}"
+

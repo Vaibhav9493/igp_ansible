@@ -1,0 +1,8 @@
+---
+galaxy_info:
+  author: Harsimran Singh/Manasi/nayan
+  description: Role for attching extra volumes to an instance.
+  company: IGP
+  license: GPL
+  min_ansible_version: 1.2
+dependencies: []

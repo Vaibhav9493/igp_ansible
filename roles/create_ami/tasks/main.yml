@@ -1,0 +1,18 @@
+- name: create AMI using instance id with tags
+  local_action:
+      module: amazon.aws.ec2_ami
+      instance_id: "{{ami_instance_id}}"
+      name: "{{ami_name}}"
+      no_reboot: yes
+      state: present
+      wait: yes
+      wait_timeout: 1800
+      tags:
+         Name: "{{ami_name}}"
+         environment: "{{ami_tag_environment}}"
+         service: "{{ami_tag_service_name}}"
+         team: "{{ami_tag_team}}"
+         app_version: "{{ami_tag_app_version}}"
+         dont_delete: "{{ami_tag_dont_delete}}"
+      region: "{{ami_region}}"
+  register: create_ami_info
